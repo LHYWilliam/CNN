@@ -8,8 +8,44 @@ class SGD:
         self.lr = lr
 
     def update(self, params, grads):
-        for key in params.keys():
-            params[key] -= self.lr * grads[key]
+        for index in range(len(params)):
+            params[index] -= self.lr * grads[index]
+
+
+class Momentum:
+    def __init__(self, lr=0.01, momentum=0.9):
+        self.lr, self.momentum = lr, momentum
+        self.v = None
+
+    def update(self, params, grads):
+        if self.v is None:
+            self.v = []
+
+            for param in params:
+                self.v.append(np.zeros_like(param))
+
+        for index in range(len(params)):
+            self.v[index] = self.momentum * self.v[index] - self.lr * grads[index]
+
+            params[index] += self.v[index]
+
+
+class AdaGrad:
+    def __init__(self, lr=0.01):
+        self.lr = lr
+        self.h = None
+
+    def update(self, params, grads, basis=1e-7):
+        if self.h is None:
+            self.h = []
+
+            for param in params:
+                self.h.append(np.zeros_like(param))
+
+        for index in range(len(params)):
+            self.h[index] += grads[index] * grads[index]
+
+            params[index] -= self.lr * grads[index] / (np.sqrt(self.h[index]) + basis)
 
 
 class Adam:
@@ -17,18 +53,19 @@ class Adam:
         self.lr, self.beta1, self.beta2 = lr, beta1, beta2
         self.iter, self.m, self.v = 0, None, None
 
-    def update(self, params, grads):
+    def update(self, params, grads, basis=1e-7):
         if self.m is None:
-            self.m, self.v = {}, {}
-            for key, val in params.items():
-                self.m[key] = np.zeros_like(val)
-                self.v[key] = np.zeros_like(val)
+            self.m, self.v = [], []
+
+            for param in params:
+                self.m.append(np.zeros_like(param))
+                self.v.append(np.zeros_like(param))
 
         self.iter += 1
         lr_t = self.lr * np.sqrt(1.0 - self.beta2 ** self.iter) / (1.0 - self.beta1 ** self.iter)
 
-        for key in params.keys():
-            self.m[key] += (1 - self.beta1) * (grads[key] - self.m[key])
-            self.v[key] += (1 - self.beta2) * (grads[key] ** 2 - self.v[key])
+        for index in range(len(params)):
+            self.m[index] += (1 - self.beta1) * (grads[index] - self.m[index])
+            self.v[index] += (1 - self.beta2) * (grads[index] ** 2 - self.v[index])
 
-            params[key] -= lr_t * self.m[key] / (np.sqrt(self.v[key]) + 1e-7)
+            params[index] -= lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)

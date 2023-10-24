@@ -6,8 +6,12 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Affine:
-    def __init__(self, W, b):
-        self.W, self.b = W, b
+    def __init__(self, input_size, output_size, basis=True):
+        self.W = np.random.randn(input_size, output_size)
+        self.b = np.random.randn(output_size) if basis else np.zeros(output_size)
+        self.param = np.array([*self.W, self.b])
+        self.grad = np.zeros_like(self.param)
+        self.acquire_grad = True
 
     def forward(self, x):
         out = np.dot(x, self.W) + self.b
@@ -23,11 +27,11 @@ class Affine:
 class ReLu:
     def __init__(self):
         self.mask = None
+        self.acquire_grad = False
 
     def forward(self, x):
         self.mask = x <= 0
 
-        x[self.mask] = 0
         out = x.copy()
         out = out[self.mask]
 
@@ -43,6 +47,7 @@ class ReLu:
 class Sigmoid:
     def __init__(self):
         self.out = None
+        self.acquire_grad = False
 
     def forward(self, x):
         out = 1 / (1 + np.exp(-x))
@@ -59,6 +64,7 @@ class Sigmoid:
 class SoftmaxWithLoss:
     def __init__(self):
         self.loss, self.y, self.t = None, None, None
+        self.acquire_grad = False
 
     def forward(self, x, t):
         self.y, self.t = softmax(x), t
