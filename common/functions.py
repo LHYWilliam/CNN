@@ -9,21 +9,18 @@ def sigmoid(x):
 
 def softmax(x):
     if x.ndim == 2:
-        x = x.T
-        x = x - np.max(x, axis=0)
-        y = np.exp(x) / np.sum(np.exp(x), axis=0)
-
-        return y.T
-
-    x = x - np.max(x)
-
-    return np.exp(x) / np.sum(np.exp(x))
+        x -= np.max(x, axis=1, keepdims=True)
+        x = np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
+    elif x.ndim == 1:
+        x -= np.max(x)
+        x = np.exp(x) / np.sum(np.exp(x))
+    return x
 
 
 def cross_entropy_error(y, t):
     if y.ndim == 1:
-        y = y.reshape(1, y.size)
-        t = t.reshape(1, t.size)
+        y = y.reshape(1, -1)
+        t = t.reshape(1, -1)
 
     if y.size == t.size:
         t = t.argmax(axis=1)

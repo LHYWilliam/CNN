@@ -1,6 +1,6 @@
 import cupy as np
 
-from common.util import (xavier, he)
+from common.util import (xavier, he)  # DO NOT MOVE
 from common.functions import (sigmoid, softmax, cross_entropy_error)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
@@ -95,3 +95,14 @@ class SoftmaxWithLoss:
             dx = dx / batch_size
 
         return dx
+
+# TODO: class Convolution:
+
+
+# TODO: class Pooling:
+
+
+# TODO: class Dropout:
+
+
+# TODO: class BatchNormalization
