@@ -16,8 +16,8 @@ class Linear:
             self.layers.append(Affine(input_size, output_size))
             if output_size != size_list[-1]:
                 self.layers.append(ReLu())
-        self.loss = SoftmaxWithLoss()
-        self.layers.append(self.loss)
+        self.loss_layer = SoftmaxWithLoss()
+        self.layers.append(self.loss_layer)
 
         for layer in self.layers:
             if layer.acquire_grad:
@@ -31,7 +31,7 @@ class Linear:
         return out
 
     def loss(self, x, t):
-        loss = self.loss.forward(x, t)
+        loss = self.loss_layer.forward(x, t)
 
         return loss
 

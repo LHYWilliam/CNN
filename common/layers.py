@@ -7,8 +7,8 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 class Affine:
     def __init__(self, input_size, output_size):
-        self.W = np.random.randn(input_size, output_size)
-        self.b = np.random.randn(output_size)
+        self.W = 0.01 * np.random.randn(input_size, output_size)
+        self.b = 0.01 * np.random.randn(output_size)
         self.param = [self.W, self.b]
 
         self.grad, self.acquire_grad = None, True
