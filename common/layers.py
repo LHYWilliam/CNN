@@ -11,7 +11,7 @@ class Affine:
         self.b = 0.01 * np.random.randn(output_size)
         self.param = [self.W, self.b]
 
-        self.grad, self.acquire_grad = None, True
+        self.grad, self.acquire_grad = [], True
         self.x, self.dW, self.db = None, None, None
 
     def forward(self, x):
@@ -26,6 +26,7 @@ class Affine:
         self.dW = np.dot(self.x.T, dout)
         self.db = np.sum(dout, axis=0)
 
+        self.grad.clear()
         self.grad = [self.dW, self.db]
 
         return dx
@@ -37,14 +38,15 @@ class ReLu:
         self.acquire_grad = False
 
     def forward(self, x):
-        self.mask = x > 0
+        self.mask = x <= 0
 
-        out = x[self.mask]
+        out = x.copy()
+        out[self.mask] = 0
 
         return out
 
     def backward(self, dout):
-        dout[~self.mask] = 0
+        dout[self.mask] = 0
         dx = dout
 
         return dx

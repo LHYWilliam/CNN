@@ -49,23 +49,24 @@ class AdaGrad:
 
 
 class Adam:
-    def __init__(self, lr=0.01, beta1=0.9, beta2=0.999):
+    def __init__(self, model, lr=0.01, beta1=0.9, beta2=0.999):
+        self.params, self.grads = model.params, model.grads
         self.lr, self.beta1, self.beta2 = lr, beta1, beta2
         self.iter, self.m, self.v = 0, None, None
 
-    def update(self, params, grads, basis=1e-7):
+    def update(self, basis=1e-7):
         if self.m is None:
             self.m, self.v = [], []
 
-            for param in params:
+            for param in self.params:
                 self.m.append(np.zeros_like(param))
                 self.v.append(np.zeros_like(param))
 
         self.iter += 1
         lr_t = self.lr * np.sqrt(1.0 - self.beta2 ** self.iter) / (1.0 - self.beta1 ** self.iter)
 
-        for index in range(len(params)):
-            self.m[index] += (1 - self.beta1) * (grads[index] - self.m[index])
-            self.v[index] += (1 - self.beta2) * (grads[index] ** 2 - self.v[index])
+        for index in range(len(self.params)):
+            self.m[index] += (1 - self.beta1) * (self.grads[index] - self.m[index])
+            self.v[index] += (1 - self.beta2) * (self.grads[index] ** 2 - self.v[index])
 
-            params[index] -= lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)
+            self.params[index] -= lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)
