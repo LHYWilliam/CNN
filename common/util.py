@@ -17,6 +17,13 @@ def progress_bar(now, total, message='', break_line=False, basis=0.01):
           f' {count}/10', end='\n' if break_line else '')
 
 
+def print_args(args):
+    print('Hype: ', end='')
+    for key, value in args.items():
+        print(f'{key}:{value}', end='  ')
+    print()
+
+
 def to_gpu(x):
     import cupy
     if type(x) is cupy.ndarray:

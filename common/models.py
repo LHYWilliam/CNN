@@ -17,7 +17,6 @@ class Linear:
             if output_size != size_list[-1]:
                 self.layers.append(ReLu())
         self.loss_layer = SoftmaxWithLoss()
-        self.layers.append(self.loss_layer)
 
         for layer in self.layers:
             if layer.acquire_grad:
@@ -25,7 +24,7 @@ class Linear:
 
     def forward(self, x):
         out = x
-        for layer in self.layers[:-1]:
+        for layer in self.layers:
             out = layer.forward(out)
 
         return out
@@ -36,7 +35,7 @@ class Linear:
         return loss
 
     def backward(self, dout=1):
-        dx = dout
+        dx = self.loss_layer.backward(dout)
         for layer in reversed(self.layers):
             dx = layer.backward(dx)
 

@@ -20,8 +20,8 @@ class Trainer:
         goal_iter = total_size // batch_size
 
         total_loss, loss_count = 0, 0
-        start_time = time.time()
         for epoch in range(goal_epoch):
+            start_time = time.time()
             index = numpy.random.permutation(numpy.arange(total_size))
             x, t = x[index], t[index]
 
