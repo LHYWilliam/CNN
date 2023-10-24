@@ -40,9 +40,9 @@ class Linear:
         for layer in reversed(self.layers):
             dx = layer.backward(dx)
 
-        self.grads.clear()
         for layer in self.layers:
             if layer.acquire_grad:
                 self.grads += layer.grad
+                layer.zero_grad()
 
         return dx

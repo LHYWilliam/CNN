@@ -26,10 +26,12 @@ class Affine:
         self.dW = np.dot(self.x.T, dout)
         self.db = np.sum(dout, axis=0)
 
-        self.grad.clear()
         self.grad = [self.dW, self.db]
 
         return dx
+
+    def zero_grad(self):
+        self.grad.clear()
 
 
 class ReLu:

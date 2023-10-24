@@ -70,3 +70,6 @@ class Adam:
             self.v[index] += (1 - self.beta2) * (self.grads[index] ** 2 - self.v[index])
 
             self.params[index] -= lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)
+
+    def zero_grad(self):
+        self.grads.clear()
