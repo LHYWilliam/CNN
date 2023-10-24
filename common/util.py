@@ -3,10 +3,18 @@ import cupy as np
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
-def progress_bar(now, total, message='', basis=0.01):
+def xavier(n):
+    return 1.0 / np.sqrt(n)
+
+
+def he(n):
+    return 2.0 / np.sqrt(n)
+
+
+def progress_bar(now, total, message='', break_line=False, basis=0.01):
     count = int((now / total + basis) * 10)
     print(f'\r{message} [' + '-' * count + ' ' * (10 - count) + ']' +
-          f' {count}/10', end='')
+          f' {count}/10', end='\n' if break_line else '')
 
 
 def to_gpu(x):

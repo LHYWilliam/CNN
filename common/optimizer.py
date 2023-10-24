@@ -4,48 +4,60 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class SGD:
-    def __init__(self, lr=0.01):
+    def __init__(self, model, lr=0.01):
+        self.params, self.grads = model.params, model.grads
         self.lr = lr
 
-    def update(self, params, grads):
-        for index in range(len(params)):
-            params[index] -= self.lr * grads[index]
+    def update(self):
+        for index in range(len(self.params)):
+            self.params[index] -= self.lr * self.grads[index]
+
+    def zero_grad(self):
+        self.grads.clear()
 
 
 class Momentum:
-    def __init__(self, lr=0.01, momentum=0.9):
+    def __init__(self, model, lr=0.01, momentum=0.9):
+        self.params, self.grads = model.params, model.grads
         self.lr, self.momentum = lr, momentum
         self.v = None
 
-    def update(self, params, grads):
+    def update(self):
         if self.v is None:
             self.v = []
 
-            for param in params:
+            for param in self.params:
                 self.v.append(np.zeros_like(param))
 
-        for index in range(len(params)):
-            self.v[index] = self.momentum * self.v[index] - self.lr * grads[index]
+        for index in range(len(self.params)):
+            self.v[index] = self.momentum * self.v[index] - self.lr * self.grads[index]
 
-            params[index] += self.v[index]
+            self.params[index] += self.v[index]
+
+    def zero_grad(self):
+        self.grads.clear()
 
 
 class AdaGrad:
-    def __init__(self, lr=0.01):
+    def __init__(self, model, lr=0.01):
+        self.params, self.grads = model.params, model.grads
         self.lr = lr
         self.h = None
 
-    def update(self, params, grads, basis=1e-7):
+    def update(self, basis=1e-7):
         if self.h is None:
             self.h = []
 
-            for param in params:
+            for param in self.params:
                 self.h.append(np.zeros_like(param))
 
-        for index in range(len(params)):
-            self.h[index] += grads[index] * grads[index]
+        for index in range(len(self.params)):
+            self.h[index] += self.grads[index] * self.grads[index]
 
-            params[index] -= self.lr * grads[index] / (np.sqrt(self.h[index]) + basis)
+            self.params[index] -= self.lr * self.grads[index] / (np.sqrt(self.h[index]) + basis)
+
+    def zero_grad(self):
+        self.grads.clear()
 
 
 class Adam:

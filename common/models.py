@@ -6,14 +6,14 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Linear:
-    def __init__(self, input_size, hidden_size_list, class_number):
+    def __init__(self, input_size, hidden_size_list, class_number, weight_init_std='xavier'):
         self.input_size, self.hidden_size_list, self.class_number = \
             input_size, hidden_size_list, class_number
         self.layers, self.params, self.grads = [], [], []
 
         size_list = [input_size] + hidden_size_list + [class_number]
         for input_size, output_size in zip(size_list, size_list[1:]):
-            self.layers.append(Affine(input_size, output_size))
+            self.layers.append(Affine(input_size, output_size, weight_init_std=weight_init_std))
             if output_size != size_list[-1]:
                 self.layers.append(ReLu())
         self.loss_layer = SoftmaxWithLoss()

@@ -1,14 +1,15 @@
 import cupy as np
 
+from common.util import (xavier, he)
 from common.functions import (sigmoid, softmax, cross_entropy_error)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Affine:
-    def __init__(self, input_size, output_size):
-        self.W = 0.01 * np.random.randn(input_size, output_size)
-        self.b = 0.01 * np.random.randn(output_size)
+    def __init__(self, input_size, output_size, weight_init_std='xavier'):
+        self.W = eval(weight_init_std)(input_size) * np.random.randn(input_size, output_size)
+        self.b = eval(weight_init_std)(input_size) * np.random.randn(output_size)
         self.param = [self.W, self.b]
 
         self.grad, self.acquire_grad = [], True
