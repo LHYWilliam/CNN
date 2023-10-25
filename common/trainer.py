@@ -45,8 +45,7 @@ class Trainer:
                               f'| iter {iter + 1:{len(str(goal_iter))}}/{goal_iter} ' \
                               f'| loss {average_loss:.4f} ' \
                               f'| time {time.time() - start_time:.2f}s'
-                    progress_bar(iter, goal_iter, message=message,
-                                 break_line=(iter + 1 == goal_iter))
+                    progress_bar(iter, goal_iter, message=message, break_line=(iter + 1 == goal_iter))
 
     def plot(self):
         x = numpy.arange(len(self.loss_list))

@@ -4,17 +4,17 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    y = 1 / (1 + np.exp(-x))
+    return y
 
 
 def softmax(x):
-    if x.ndim == 2:
-        x -= np.max(x, axis=1, keepdims=True)
-        x = np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
-    elif x.ndim == 1:
-        x -= np.max(x)
-        x = np.exp(x) / np.sum(np.exp(x))
-    return x
+    y = x.copy()
+    if y.ndim == 1:
+        y = y.reshape(1, -1)
+    y -= np.max(y, axis=1, keepdims=True)
+    y = np.exp(y) / np.sum(np.exp(y), axis=1, keepdims=True)
+    return y
 
 
 def cross_entropy_error(y, t):

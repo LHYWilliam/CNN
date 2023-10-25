@@ -35,10 +35,10 @@ if __name__ == '__main__':
     numpy.random.seed(seed)
     np.random.seed(seed)
 
-    (x_train, t_train), (x_test, t_test) = load_mnist(one_hot_label=True)
+    (x_train, t_train), (x_test, t_test) = load_mnist()
     x_train, t_train = to_gpu(x_train), to_gpu(t_train)
 
-    input_size, class_number = x_train.shape[1], t_train.shape[1]
+    input_size, class_number = x_train.shape[1], 10
 
     model = Linear(input_size, hidden_size_list, class_number, weight_init_std=weight_init_std)
     optimizer = Adam(model=model, lr=lr)
