@@ -45,3 +45,18 @@ class Linear:
                 layer.zero_grad()
 
         return dx
+
+    def predict(self, x):
+        y = self.forward(x).argmax(axis=0) if x.ndim == 1\
+            else np.array([self.forward(one) for one in x]).argmax(axis=1)
+
+        return y
+
+    def val(self, x, t):
+        total_count = 1 if x.ndim == 1 else x.shape[0]
+        y = self.predict(x)
+
+        accu_count = np.sum(y == t)
+        accuracy = accu_count / total_count
+
+        return accuracy
