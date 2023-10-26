@@ -36,7 +36,7 @@ if __name__ == '__main__':
     np.random.seed(seed)
 
     (x_train, t_train), (x_test, t_test) = load_mnist()
-    x_train, t_train = to_gpu(x_train), to_gpu(t_train)
+    x_train, t_train, x_test, t_test = to_gpu(x_train, t_train, x_test, t_test)
 
     input_size, class_number = x_train.shape[1], 10
 

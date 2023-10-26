@@ -1,3 +1,5 @@
+import numpy
+import cupy
 import cupy as np
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
@@ -24,15 +26,19 @@ def print_args(args):
     print()
 
 
-def to_gpu(x):
-    import cupy
-    if type(x) is cupy.ndarray:
-        return x
-    return cupy.asarray(x)
+def to_gpu(*args):
+    out = []
+
+    for x in args:
+        out.append(x if type(x) is cupy.ndarray else cupy.asarray(x))
+
+    return out
 
 
-def to_cpu(x):
-    import numpy
-    if type(x) is numpy.ndarray:
-        return x
-    return np.asnumpy(x)
+def to_cpu(*args):
+    out = []
+
+    for x in args:
+        out.append(x if type(x) is numpy.ndarray else cupy.asnumpy(x))
+
+    return out
