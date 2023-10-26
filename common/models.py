@@ -32,7 +32,7 @@ class Linear:
     def loss(self, x, t):
         loss = self.loss_layer.forward(x, t)
 
-        return loss
+        return loss.item()
 
     def backward(self, dout=1):
         dx = self.loss_layer.backward(dout)

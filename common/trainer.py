@@ -45,11 +45,10 @@ class Trainer:
                     total_loss, train_accu_count = 0, 0
 
     def _train_show(self, epoch, iter, goal_epoch, goal_iter, batch_size, total_loss, train_accu_count, start_time):
-        interval_iter = self.show_per_iter if (iter + 1) % self.show_per_iter == 0 \
-            else goal_iter % self.show_per_iter
+        interval_iter = self.show_per_iter if (iter + 1) % self.show_per_iter == 0 else goal_iter % self.show_per_iter
 
         average_loss = total_loss / interval_iter
-        self.loss_list.append(float(average_loss))
+        self.loss_list.append(average_loss)
 
         train_accuracy = train_accu_count / (batch_size * interval_iter)
 
