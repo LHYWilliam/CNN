@@ -1,6 +1,7 @@
 import numpy
 import cupy
 import cupy as np
+from matplotlib import pyplot as plt
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
@@ -13,10 +14,22 @@ def he(n):
     return 2.0 / np.sqrt(n)
 
 
-def progress_bar(now, total, message='', break_line=False, basis=0.01):
+def plots(lists, labels, xlabel, ylabel):
+    x = numpy.arange(1, len(lists[0]) + 1)
+    for y, label in zip(lists, labels):
+        plt.plot(x, y, label=label)
+
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend()
+    plt.show()
+
+
+def progress_bar(now, total, message='', bar=False, break_line=False, basis=0.01):
     count = int((now / total + basis) * 10)
-    print(f'\r{message} [' + '-' * count + ' ' * (10 - count) + ']' +
-          f' {count}/10', end='\n' if break_line else '')
+    if bar:
+        message += '[' + '-' * count + ' ' * (10 - count) + ']' + f' {count}/10'
+    print(f'\r{message}', end='\n' if break_line else '')
 
 
 def print_args(args):

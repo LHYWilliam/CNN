@@ -48,7 +48,7 @@ class Linear:
 
     def predict(self, x):
         y = self.forward(x).argmax(axis=0) if x.ndim == 1\
-            else np.array([self.forward(one) for one in x]).argmax(axis=1)
+            else self.forward(x).argmax(axis=1)
 
         return y
 
@@ -56,7 +56,7 @@ class Linear:
         total_count = 1 if x.ndim == 1 else x.shape[0]
         y = self.predict(x)
 
-        accu_count = np.sum(y == t)
+        accu_count = np.sum(y == t).item()
         accuracy = accu_count / total_count
 
         return accuracy

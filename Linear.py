@@ -39,6 +39,7 @@ if __name__ == '__main__':
     (x_train, t_train), (x_test, t_test) = load_mnist()
     x_train, t_train, x_test, t_test = to_gpu(x_train, t_train, x_test, t_test)
     train_loader = DataLoader(x_train, t_train, batch_size)
+    test_loader = DataLoader(x_test, t_test, batch_size)
 
     input_size, class_number = x_train.shape[1], 10
 
@@ -46,5 +47,4 @@ if __name__ == '__main__':
     optimizer = Adam(model=model, lr=lr)
 
     trainer = Trainer(model, optimizer)
-    trainer.train(train_loader, goal_epoch=goal_epoch, batch_size=batch_size)
-    trainer.plot()
+    trainer.train(train_loader, test_loader, goal_epoch=goal_epoch, batch_size=batch_size)
