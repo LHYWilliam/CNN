@@ -38,7 +38,7 @@ class Affine:
 
 
 class Convolution:
-    def __init__(self, channel, filter_number, filter_size, stride=1, pad=0, weight_init_std='xavier'):
+    def __init__(self, filter_number, channel, filter_size, stride=1, pad=0, weight_init_std='xavier'):
         self.W = 0.01 * np.random.randn(filter_number, channel, filter_size, filter_size)
         self.b = np.zeros(filter_number)
         self.param = [self.W, self.b]
@@ -76,7 +76,12 @@ class Convolution:
         dcol = np.dot(dout, self.col_W.T)
         dx = col2im(dcol, self.x.shape, FH, FW, self.stride, self.pad)
 
+        self.grad += [self.dW, self.db]
+
         return dx
+
+    def zero_grad(self):
+        self.grad.clear()
 
 
 class Pooling:
@@ -113,6 +118,24 @@ class Pooling:
 
         dcol = dmax.reshape(dmax.shape[0] * dmax.shape[1] * dmax.shape[2], -1)
         dx = col2im(dcol, self.x.shape, self.h, self.w, self.stride, self.pad)
+
+        return dx
+
+
+class Flatten:
+    def __init__(self):
+        self.acquire_grad = False
+
+        self.x, self.shape = None, None
+
+    def forward(self, x):
+        self.shape = x.shape
+        out = x.reshape(x.shape[0], -1)
+
+        return out
+
+    def backward(self, dout):
+        dx = dout.reshape(*self.shape)
 
         return dx
 

@@ -48,7 +48,7 @@ if __name__ == '__main__':
     if loads:
         model, optimizer = load(weight)
     else:
-        model = Convolutional(channel, input_size, hidden_size_list, class_number, weight_init_std=weight_init_std)
+        model = Convolutional()
         optimizer = Adam(model=model, lr=lr)
 
     trainer = Trainer(model, optimizer)
