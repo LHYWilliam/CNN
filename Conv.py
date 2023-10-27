@@ -4,7 +4,7 @@ import numpy
 import cupy as np
 
 from common.util import (print_args, load, save, to_gpu)
-from common.models import Linear
+from common.models import Convolutional
 from common.optimizer import Adam
 from common.trainer import Trainer
 from common.dataloader import DataLoader
@@ -23,7 +23,7 @@ def parse_opt():
     parser.add_argument('--weight-init-std', type=str, default='xavier')
     parser.add_argument('--loads', action='store_true')
     parser.add_argument('--saves', action='store_true')
-    parser.add_argument('--weight', type=str, default='./data/Linear/weight.pkl')
+    parser.add_argument('--weight', type=str, default='./data/Conv/weight.pkl')
     parser.add_argument('--seed', type=int, default=0)
 
     return parser.parse_args()
@@ -39,16 +39,16 @@ if __name__ == '__main__':
     numpy.random.seed(seed)
     np.random.seed(seed)
 
-    (x_train, t_train), (x_test, t_test) = load_mnist()
+    (x_train, t_train), (x_test, t_test) = load_mnist(flatten=False)
     x_train, t_train, x_test, t_test = to_gpu(x_train, t_train, x_test, t_test)
     train_loader = DataLoader(x_train, t_train, batch_size)
     test_loader = DataLoader(x_test, t_test, batch_size)
 
-    input_size, class_number = x_train.shape[1], 10
+    channel, input_size, class_number = x_train[1], x_train.shape[2], 10
     if loads:
         model, optimizer = load(weight)
     else:
-        model = Linear(input_size, hidden_size_list, class_number, weight_init_std=weight_init_std)
+        model = Convolutional(channel, input_size, hidden_size_list, class_number, weight_init_std=weight_init_std)
         optimizer = Adam(model=model, lr=lr)
 
     trainer = Trainer(model, optimizer)

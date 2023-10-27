@@ -1,6 +1,6 @@
 import cupy as np
 
-from common.util import (xavier, he)  # DO NOT MOVE
+from common.util import (xavier, he, im2col, col2im)  # DO NOT MOVE
 from common.functions import (sigmoid, softmax, cross_entropy_error)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
@@ -12,8 +12,10 @@ class Affine:
         self.b = eval(weight_init_std)(input_size) * np.random.randn(output_size)
         self.param = [self.W, self.b]
 
+        self.dW, self.db = None, None
         self.grad, self.acquire_grad = [], True
-        self.x, self.dW, self.db = None, None, None
+
+        self.x = None
 
     def forward(self, x):
         self.x = x
@@ -33,6 +35,86 @@ class Affine:
 
     def zero_grad(self):
         self.grad.clear()
+
+
+class Convolution:
+    def __init__(self, channel, filter_number, filter_size, stride=1, pad=0, weight_init_std='xavier'):
+        self.W = 0.01 * np.random.randn(filter_number, channel, filter_size, filter_size)
+        self.b = np.zeros(filter_number)
+        self.param = [self.W, self.b]
+
+        self.dW, self.db = None, None
+        self.grad, self.acquire_grad = [], True
+
+        self.stride, self.pad = stride, pad
+        self.x, self.col, self.col_W = None, None, None
+
+    def forward(self, x):
+        FN, C, FH, FW = self.W.shape
+        N, C, H, W = x.shape
+
+        out_h = 1 + int((H + 2 * self.pad - FH) / self.stride)
+        out_w = 1 + int((W + 2 * self.pad - FW) / self.stride)
+
+        col = im2col(x, FH, FW, self.stride, self.pad)
+        col_W = self.W.reshape(FN, -1).T
+
+        out = np.dot(col, col_W) + self.b
+        out = out.reshape(N, out_h, out_w, -1).transpose(0, 3, 1, 2)
+
+        self.x, self.col, self.col_W = x, col, col_W
+
+        return out
+
+    def backward(self, dout):
+        FN, C, FH, FW = self.W.shape
+        dout = dout.transpose(0, 2, 3, 1).reshape(-1, FN)
+
+        self.db, self.dW = np.sum(dout, axis=0), np.dot(self.col.T, dout)
+        self.dW = self.dW.transpose(1, 0).reshape(FN, C, FH, FW)
+
+        dcol = np.dot(dout, self.col_W.T)
+        dx = col2im(dcol, self.x.shape, FH, FW, self.stride, self.pad)
+
+        return dx
+
+
+class Pooling:
+    def __init__(self, h, w, stride=1, pad=0):
+        self.h, self.w, self.stride, self.pad = h, w, stride, pad
+
+        self.acquire_grad = False
+
+        self.x, self.arg_max = None, None
+
+    def forward(self, x):
+        N, C, H, W = x.shape
+        out_h = int(1 + (H - self.h) / self.stride)
+        out_w = int(1 + (W - self.w) / self.stride)
+
+        col = im2col(x, self.h, self.w, self.stride, self.pad)
+        col = col.reshape(-1, self.h * self.w)
+
+        arg_max = np.argmax(col, axis=1)
+        out = np.max(col, axis=1)
+        out = out.reshape(N, out_h, out_w, C).transpose(0, 3, 1, 2)
+
+        self.x, self.arg_max = x, arg_max
+
+        return out
+
+    def backward(self, dout):
+        dout = dout.transpose(0, 2, 3, 1)
+
+        pool_size = self.h * self.w
+        dmax = np.zeros((dout.size, pool_size))
+        dmax[np.arange(self.arg_max.size), self.arg_max.flatten()] = dout.flatten()
+        dmax = dmax.reshape(dout.shape + (pool_size,))
+
+        dcol = dmax.reshape(dmax.shape[0] * dmax.shape[1] * dmax.shape[2], -1)
+        dx = col2im(dcol, self.x.shape, self.h, self.w, self.stride, self.pad)
+
+        return dx
 
 
 class ReLu:
