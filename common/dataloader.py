@@ -1,5 +1,3 @@
-import math
-
 import numpy
 import cupy as np
 
@@ -14,10 +12,10 @@ class DataLoader:
         self.iter = -1
 
         if shuffle:
-            self._shuffle()
+            self.shuffle()
 
     def __len__(self):
-        return math.floor(self.total_size / self.batch_size)
+        return int(self.total_size / self.batch_size)
 
     def __getitem__(self, iter):
         begin, end = iter * self.batch_size, (iter + 1) * self.batch_size
@@ -32,10 +30,10 @@ class DataLoader:
             return self[self.iter]
         else:
             self.iter = -1
-            self._shuffle()
+            self.shuffle()
             raise StopIteration
 
-    def _shuffle(self):
+    def shuffle(self):
         index = numpy.random.permutation(numpy.arange(self.total_size))
         self.train, self.test = self.train[index], self.test[index]
 

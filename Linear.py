@@ -47,4 +47,4 @@ if __name__ == '__main__':
     optimizer = Adam(model=model, lr=lr)
 
     trainer = Trainer(model, optimizer)
-    trainer.train(train_loader, test_loader, goal_epoch=goal_epoch, batch_size=batch_size)
+    trainer.train(train_loader, test_loader, epochs=goal_epoch, batch_size=batch_size)

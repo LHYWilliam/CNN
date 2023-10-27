@@ -25,9 +25,9 @@ def plots(lists, labels, xlabel, ylabel):
     plt.show()
 
 
-def progress_bar(now, total, message='', bar=False, break_line=False, basis=0.01):
-    count = int((now / total + basis) * 10)
+def progress_bar(now, total, message='', break_line=False, bar=False):
     if bar:
+        count = int(((now + 1) / total) * 10)
         message += '[' + '-' * count + ' ' * (10 - count) + ']' + f' {count}/10'
     print(f'\r{message}', end='\n' if break_line else '')
 

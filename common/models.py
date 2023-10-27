@@ -7,8 +7,7 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 class Linear:
     def __init__(self, input_size, hidden_size_list, class_number, weight_init_std='xavier'):
-        self.input_size, self.hidden_size_list, self.class_number = \
-            input_size, hidden_size_list, class_number
+        self.input_size, self.hidden_size_list, self.class_number = input_size, hidden_size_list, class_number
         self.layers, self.params, self.grads = [], [], []
 
         size_list = [input_size] + hidden_size_list + [class_number]
@@ -29,8 +28,8 @@ class Linear:
 
         return out
 
-    def loss(self, x, t):
-        loss = self.loss_layer.forward(x, t)
+    def loss(self, y, t):
+        loss = self.loss_layer.forward(y, t)
 
         return loss.item()
 
