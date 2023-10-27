@@ -44,18 +44,14 @@ def print_args(args):
 
 def save(file, model, optimizer):
     file = Path(file)
-    with open(file / Path('model.pkl'), 'wb') as f:
-        pickle.dump(model, f)
-    with open(file / Path('optimizer.pkl'), 'wb') as f:
-        pickle.dump(optimizer, f)
+    with open(file / Path('weights.pkl'), 'wb') as f:
+        pickle.dump((model, optimizer), f)
 
 
 def load(file):
     file = Path(file)
-    with open(file / Path('model.pkl'), 'rb') as f:
-        model = pickle.load(f)
-    with open(file / Path('optimizer.pkl'), 'rb') as f:
-        optimizer = pickle.load(f)
+    with open(file / Path('weights.pkl'), 'rb') as f:
+        model, optimizer = pickle.load(f)
 
     return model, optimizer
 

@@ -66,8 +66,7 @@ class Adam:
         self.lr, self.beta1, self.beta2 = lr, beta1, beta2
         self.iter, self.m, self.v = 0, None, None
 
-    def update(self, model, basis=1e-7):
-        self.params, self.grads = model.params, model.grads
+    def update(self, basis=1e-7):
         if self.m is None:
             self.m, self.v = [], []
 

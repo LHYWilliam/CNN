@@ -29,7 +29,7 @@ class Trainer:
                 train_accu_count += np.sum(y.argmax(axis=1) == t_batch).item()
 
                 self.model.backward()
-                self.optimizer.update(self.model)
+                self.optimizer.update()
                 self.optimizer.zero_grad()
 
                 if (iter + 1) % self.train_show_per_iter == 0 or iter + 1 == self.train_iters:
