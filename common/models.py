@@ -51,11 +51,11 @@ class Linear:
 
         return y
 
-    def val(self, x, t):
+    def accuracy(self, x, t):
         total_count = 1 if x.ndim == 1 else x.shape[0]
         y = self.predict(x)
 
-        accu_count = np.sum(y == t).item()
+        accu_count = np.sum(y == t)
         accuracy = accu_count / total_count
 
-        return accuracy
+        return accuracy.item()

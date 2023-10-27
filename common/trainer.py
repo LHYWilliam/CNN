@@ -19,7 +19,7 @@ class Trainer:
         self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
 
         for epoch in range(epochs):
-            total_loss, train_accu_count, test_accuracys = .0, 0, .0
+            total_loss, train_accu_count, test_total_accuracy = .0, 0, .0
 
             train_start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(train_loader):
@@ -48,10 +48,10 @@ class Trainer:
 
             test_start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(test_loader):
-                test_accuracys += self.model.val(x_batch, t_batch)
+                test_total_accuracy += self.model.accuracy(x_batch, t_batch)
 
                 if (iter + 1) % self.test_show_per_iter == 0 or iter + 1 == self.test_iters:
-                    test_accuracy = test_accuracys / (iter + 1)
+                    test_accuracy = test_total_accuracy / (iter + 1)
 
                     self._test_show(iter, test_accuracy, test_start_time)
 
