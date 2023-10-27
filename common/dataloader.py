@@ -1,16 +1,41 @@
+import math
+
+import numpy
 import cupy as np
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class DataLoader:
-    def __init__(self, train, test, batch_size):
+    def __init__(self, train, test, batch_size, shuffle=True):
         self.train, self.test = train, test
-        self.batch_size = batch_size
+        self.total_size, self.batch_size = self.train.shape[0], batch_size
+
+        self.iter = -1
+
+        if shuffle:
+            self._shuffle()
 
     def __len__(self):
-        return self.train.shape[0]
+        return math.floor(self.total_size / self.batch_size)
 
-    def __getitem__(self, position):
-        return (self.train[position * self.batch_size:(position + 1) * self.batch_size],
-                self.test[position * self.batch_size:(position + 1) * self.batch_size])
+    def __getitem__(self, iter):
+        begin, end = iter * self.batch_size, (iter + 1) * self.batch_size
+        return self.train[begin:end], self.test[begin:end]
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self.iter += 1
+        if self.iter < len(self):
+            return self[self.iter]
+        else:
+            self.iter = -1
+            self._shuffle()
+            raise StopIteration
+
+    def _shuffle(self):
+        index = numpy.random.permutation(numpy.arange(self.total_size))
+        self.train, self.test = self.train[index], self.test[index]
+

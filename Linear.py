@@ -7,6 +7,7 @@ from common.util import (print_args, to_gpu)
 from common.models import Linear
 from common.optimizer import Adam
 from common.trainer import Trainer
+from common.dataloader import DataLoader
 
 from dataset.mnist import load_mnist
 
@@ -37,6 +38,7 @@ if __name__ == '__main__':
 
     (x_train, t_train), (x_test, t_test) = load_mnist()
     x_train, t_train, x_test, t_test = to_gpu(x_train, t_train, x_test, t_test)
+    train_loader = DataLoader(x_train, t_train, batch_size)
 
     input_size, class_number = x_train.shape[1], 10
 
@@ -44,5 +46,5 @@ if __name__ == '__main__':
     optimizer = Adam(model=model, lr=lr)
 
     trainer = Trainer(model, optimizer)
-    trainer.train(x_train, t_train, goal_epoch=goal_epoch, batch_size=batch_size)
+    trainer.train(train_loader, goal_epoch=goal_epoch, batch_size=batch_size)
     trainer.plot()

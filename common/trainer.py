@@ -15,19 +15,14 @@ class Trainer:
         self.show_per_iter = show_per_iter
         self.loss_list = []
 
-    def train(self, x, t, goal_epoch=16, batch_size=128):
-        total_size = x.shape[0]
-        goal_iter = total_size // batch_size
+    def train(self, train_loader, goal_epoch=16, batch_size=128):
+        goal_iter = len(train_loader)
 
         for epoch in range(goal_epoch):
             start_time = time.time()
-            index = numpy.random.permutation(numpy.arange(total_size))
-            x, t = x[index], t[index]
 
             total_loss, train_accu_count = 0, 0
-            for iter in range(goal_iter):
-                x_batch = x[iter * batch_size:(iter + 1) * batch_size]
-                t_batch = t[iter * batch_size:(iter + 1) * batch_size]
+            for iter, (x_batch, t_batch) in enumerate(train_loader):
 
                 y = self.model.forward(x_batch)
 
