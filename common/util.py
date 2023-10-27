@@ -1,3 +1,6 @@
+import pickle
+from pathlib import Path
+
 import numpy
 import cupy
 import cupy as np
@@ -37,6 +40,24 @@ def print_args(args):
     for key, value in args.items():
         print(f'{key}:{value}', end='  ')
     print()
+
+
+def save(file, model, optimizer):
+    file = Path(file)
+    with open(file / Path('model.pkl'), 'wb') as f:
+        pickle.dump(model, f)
+    with open(file / Path('optimizer.pkl'), 'wb') as f:
+        pickle.dump(optimizer, f)
+
+
+def load(file):
+    file = Path(file)
+    with open(file / Path('model.pkl'), 'rb') as f:
+        model = pickle.load(f)
+    with open(file / Path('optimizer.pkl'), 'rb') as f:
+        optimizer = pickle.load(f)
+
+    return model, optimizer
 
 
 def to_gpu(*args):

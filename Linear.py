@@ -3,7 +3,7 @@ import argparse
 import numpy
 import cupy as np
 
-from common.util import (print_args, to_gpu)
+from common.util import (print_args, save, load, to_gpu)
 from common.models import Linear
 from common.optimizer import Adam
 from common.trainer import Trainer
@@ -22,7 +22,8 @@ def parse_opt():
     parser.add_argument('--hidden-size', type=int, nargs='+', default=[16, 64, 128, 64, 16])
     parser.add_argument('--weight-init-std', type=str, default='xavier')
     parser.add_argument('--seed', type=int, default=0)
-    # TODO: parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--loads', action='store_true')
+    parser.add_argument('--saves', action='store_true')
 
     return parser.parse_args()
 
@@ -30,8 +31,9 @@ def parse_opt():
 if __name__ == '__main__':
     opt = vars(parse_opt())
     print_args(opt)
-    lr, goal_epoch, batch_size, hidden_size_list, weight_init_std, seed = \
-        opt['lr'], opt['epochs'], opt['batch_size'], opt['hidden_size'], opt['weight_init_std'], opt['seed']
+    lr, goal_epoch, batch_size, hidden_size_list, weight_init_std, loads, saves, seed = \
+        (opt['lr'], opt['epochs'], opt['batch_size'], opt['hidden_size'],
+         opt['weight_init_std'], opt['loads'], opt['saves'], opt['seed'])
 
     numpy.random.seed(seed)
     np.random.seed(seed)
@@ -42,9 +44,14 @@ if __name__ == '__main__':
     test_loader = DataLoader(x_test, t_test, batch_size)
 
     input_size, class_number = x_train.shape[1], 10
-
-    model = Linear(input_size, hidden_size_list, class_number, weight_init_std=weight_init_std)
-    optimizer = Adam(model=model, lr=lr)
+    if loads:
+        model, optimizer = load('./data/')
+    else:
+        model = Linear(input_size, hidden_size_list, class_number, weight_init_std=weight_init_std)
+        optimizer = Adam(model=model, lr=lr)
 
     trainer = Trainer(model, optimizer)
     trainer.train(train_loader, test_loader, epochs=goal_epoch, batch_size=batch_size)
+
+    if saves:
+        save('./data/', model, optimizer)
