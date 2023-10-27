@@ -59,7 +59,7 @@ class Trainer:
                         self.test_accuracy_list.append(test_accuracy)
 
         if plot:
-            plots([self.loss_list], ['train loss'], [f'iter * {self.train_show_per_iter}'], ['loss'])
+            plots([self.loss_list], ['train loss'], f'iter * {self.train_show_per_iter}', 'loss')
             plots([self.train_accuracy_list, self.test_accuracy_list], ['train accuracy', 'test accuracy'],
                   f'iter * {self.train_show_per_iter}', 'accuracy')
 

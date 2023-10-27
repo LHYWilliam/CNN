@@ -1,5 +1,4 @@
 import pickle
-from pathlib import Path
 
 import numpy
 import cupy
@@ -43,14 +42,12 @@ def print_args(args):
 
 
 def save(file, model, optimizer):
-    file = Path(file)
-    with open(file / Path('weights.pkl'), 'wb') as f:
+    with open(file, 'wb') as f:
         pickle.dump((model, optimizer), f)
 
 
 def load(file):
-    file = Path(file)
-    with open(file / Path('weights.pkl'), 'rb') as f:
+    with open(file, 'rb') as f:
         model, optimizer = pickle.load(f)
 
     return model, optimizer
