@@ -3,7 +3,7 @@ import argparse
 import numpy
 import cupy as np
 
-from common.util import (print_args, load, save, to_gpu)
+from common.util import (parse_opt,print_args, load, save, to_gpu)
 from common.models import Linear
 from common.optimizer import Adam
 from common.trainer import Trainer
@@ -12,21 +12,6 @@ from common.dataloader import DataLoader
 from dataset.mnist import load_mnist
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
-
-
-def parse_opt():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--lr', type=float, default=0.001)
-    parser.add_argument('--epochs', type=int, default=16)
-    parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--hidden-size', type=int, nargs='+', default=[16, 64, 128, 64, 16])
-    parser.add_argument('--weight-init-std', type=str, default='xavier')
-    parser.add_argument('--loads', action='store_true')
-    parser.add_argument('--saves', action='store_true')
-    parser.add_argument('--weight', type=str, default='./data/Linear/weight.pkl')
-    parser.add_argument('--seed', type=int, default=0)
-
-    return parser.parse_args()
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import pickle
+import argparse
 
 import numpy
 import cupy
@@ -32,6 +33,22 @@ def progress_bar(now, total, message='', break_line=False, bar=False):
         count = int(((now + 1) / total) * 10)
         message += '[' + '-' * count + ' ' * (10 - count) + ']' + f' {count}/10'
     print(f'\r{message}', end='\n' if break_line else '')
+
+
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--cfg', type=str, default='./models/Convolutional.json')
+    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--epochs', type=int, default=16)
+    parser.add_argument('--batch-size', type=int, default=128)
+    parser.add_argument('--hidden-size', type=int, nargs='+', default=[16, 64, 128, 64, 16])
+    parser.add_argument('--weight-init-std', type=str, default='xavier')
+    parser.add_argument('--loads', action='store_true')
+    parser.add_argument('--saves', action='store_true')
+    parser.add_argument('--weight', type=str, default='./data/Conv/weight.pkl')
+    parser.add_argument('--seed', type=int, default=0)
+
+    return parser.parse_args()
 
 
 def print_args(args):

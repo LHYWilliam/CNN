@@ -1,6 +1,6 @@
 import cupy as np
 
-from common.layers import (Affine, Convolution, Pooling, Flatten, ReLu, SoftmaxWithLoss)
+from common.layers import (Affine, Convolution, Pooling, Flatten, ReLu, SoftmaxWithLoss)  # DO NOT MOVE
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
@@ -68,18 +68,12 @@ class Linear(BaseModel):
 
 
 class Convolutional(BaseModel):
-    def __init__(self):
+    def __init__(self, layer_params):
         super().__init__()
-        self.params, self.grads = [], []
-        self.layers = [
-            Convolution(16, 1, 3, 1, 1),
-            ReLu(),
-            Pooling(2, 2, 2, 0),
-            Flatten(),
-            Affine(14 * 14 * 16, 64),
-            ReLu(),
-            Affine(64, 10)
-        ]
+        self.layers, self.params, self.grads = [], [], []
+
+        for layer_param in layer_params:
+            self.layers.append(eval(layer_param['layer'])(*layer_param['param']))
         self.loss_layer = SoftmaxWithLoss()
 
         for layer in self.layers:
