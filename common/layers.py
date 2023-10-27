@@ -17,7 +17,7 @@ class Affine:
 
         self.x = None
 
-    def forward(self, x):
+    def forward(self, x, train=True):
         self.x = x
 
         out = np.dot(x, self.W) + self.b
@@ -49,7 +49,7 @@ class Convolution:
         self.stride, self.pad = stride, pad
         self.x, self.col, self.col_W = None, None, None
 
-    def forward(self, x):
+    def forward(self, x, train=True):
         FN, C, FH, FW = self.W.shape
         N, C, H, W = x.shape
 
@@ -92,7 +92,7 @@ class Pooling:
 
         self.x, self.arg_max = None, None
 
-    def forward(self, x):
+    def forward(self, x, train=True):
         N, C, H, W = x.shape
         out_h = int(1 + (H - self.h) / self.stride)
         out_w = int(1 + (W - self.w) / self.stride)
@@ -128,7 +128,7 @@ class Flatten:
 
         self.x, self.shape = None, None
 
-    def forward(self, x):
+    def forward(self, x, train=True):
         self.shape = x.shape
         out = x.reshape(x.shape[0], -1)
 
@@ -145,7 +145,7 @@ class ReLu:
         self.mask = None
         self.acquire_grad = False
 
-    def forward(self, x):
+    def forward(self, x, train=True):
         self.mask = x <= 0
 
         out = x.copy()
@@ -165,7 +165,7 @@ class Sigmoid:
         self.out = None
         self.acquire_grad = False
 
-    def forward(self, x):
+    def forward(self, x, train=True):
         out = sigmoid(x)
         self.out = out
 
@@ -177,12 +177,29 @@ class Sigmoid:
         return dx
 
 
+class Dropout:
+    def __init__(self, ratio=0.5):
+        self.ratio, self.mask = ratio, None
+
+        self.acquire_grad = False
+
+    def forward(self, x, train=True):
+        if train:
+            self.mask = np.random.rand(*x.shape) > self.ratio
+            return x * self.mask
+        else:
+            return x * (1.0 - self.ratio)
+
+    def backward(self, dout):
+        return dout * self.mask
+
+
 class SoftmaxWithLoss:
     def __init__(self):
         self.y, self.t = None, None
         self.acquire_grad = False
 
-    def forward(self, x, t):
+    def forward(self, x, t, train=True):
         self.y, self.t = softmax(x), t
 
         loss = cross_entropy_error(self.y, self.t)
@@ -200,14 +217,5 @@ class SoftmaxWithLoss:
             dx = dx / batch_size
 
         return dx
-
-# TODO: class Convolution:
-
-
-# TODO: class Pooling:
-
-
-# TODO: class Dropout:
-
 
 # TODO: class BatchNormalization

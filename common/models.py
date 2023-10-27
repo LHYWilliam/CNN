@@ -1,6 +1,6 @@
 import cupy as np
 
-from common.layers import (Affine, Convolution, Pooling, Flatten, ReLu, SoftmaxWithLoss)  # DO NOT MOVE
+from common.layers import (Affine, Convolution, Pooling, Flatten, ReLu, Dropout, SoftmaxWithLoss)  # DO NOT MOVE
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
@@ -9,10 +9,10 @@ class BaseModel:
     def __init__(self):
         self.layers, self.loss_layer, self.grads = None, None, None
 
-    def forward(self, x):
+    def forward(self, x, train=True):
         out = x
         for layer in self.layers:
-            out = layer.forward(out)
+            out = layer.forward(out, train)
 
         return out
 
@@ -33,9 +33,9 @@ class BaseModel:
 
         return dx
 
-    def predict(self, x):
-        y = self.forward(x).argmax(axis=0) if x.ndim == 1 \
-            else self.forward(x).argmax(axis=1)
+    def predict(self, x, train=False):
+        y = self.forward(x, train).argmax(axis=0) if x.ndim == 1 \
+            else self.forward(x, train).argmax(axis=1)
 
         return y
 
