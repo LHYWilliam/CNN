@@ -3,7 +3,7 @@ from collections import deque
 
 import cupy as np
 
-from common.util import (plots, progress_bar)
+from common.util import (plots, progress_bar, save)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
@@ -15,7 +15,7 @@ class Trainer:
         self.epochs, self.train_iters, self.test_iters = None, None, None
 
     def train(self, train_loader, test_loader, epochs=16, batch_size=128,
-              train_show=1, test_show=1, noplot=False):
+              train_show=1, test_show=1, noplot=False, save_path=None):
 
         self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
 
@@ -83,6 +83,9 @@ class Trainer:
                     test_total_accuracy = .0
 
             print()
+
+            if save_path:
+                save(save_path, self.model, self.optimizer)
 
         if not noplot:
             plots([total_iters_loss], ['train loss'], f'iter * {train_show}', 'loss')

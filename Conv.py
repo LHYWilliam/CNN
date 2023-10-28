@@ -27,6 +27,8 @@ def main(opt):
     train_loader = DataLoader(x_train, t_train, batch_size)
     test_loader = DataLoader(x_test, t_test, batch_size)
 
+    save_path = increment_path('data/train') / 'weight.pkl'
+
     if weight:
         model, optimizer = load(weight)
         print_cfg(model.cfg)
@@ -41,10 +43,10 @@ def main(opt):
 
     trainer = Trainer(model, optimizer)
     trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size,
-                  train_show=train_show_per_iter, test_show=test_show_per_iter, noplot=noplot)
+                  train_show=train_show_per_iter, test_show=test_show_per_iter, noplot=noplot, save_path=save_path)
 
     if not nosave:
-        save(increment_path('data/train') / 'weight.pkl', model, optimizer)
+        save(save_path, model, optimizer)
 
 
 if __name__ == '__main__':
