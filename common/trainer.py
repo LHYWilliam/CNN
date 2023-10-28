@@ -8,7 +8,7 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Trainer:
-    def __init__(self, model, optimizer, train_show_per_iter=32, test_show_per_iter=4):
+    def __init__(self, model, optimizer, train_show_per_iter=64, test_show_per_iter=32):
         self.model, self.optimizer = model, optimizer
         self.train_show_per_iter, self.test_show_per_iter = train_show_per_iter, test_show_per_iter
 
