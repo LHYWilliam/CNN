@@ -7,7 +7,7 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Affine:
-    def __init__(self, input_size, output_size, weight_init_std='xavier'):
+    def __init__(self, input_size, output_size, weight_init_std='he'):
         self.W = eval(weight_init_std)(input_size) * np.random.randn(input_size, output_size)
         self.b = eval(weight_init_std)(input_size) * np.random.randn(output_size)
         self.param = [self.W, self.b]
@@ -38,8 +38,8 @@ class Affine:
 
 
 class Convolution:
-    def __init__(self, filter_number, channel, filter_size, stride=1, pad=0, weight_init_std='xavier'):
-        self.W = 0.01 * np.random.randn(filter_number, channel, filter_size, filter_size)
+    def __init__(self, filter_number, channel, filter_size, stride=1, pad=0, weight_init_std='he'):
+        self.W = eval(weight_init_std)(channel) * np.random.randn(filter_number, channel, filter_size, filter_size)
         self.b = np.zeros(filter_number)
         self.param = [self.W, self.b]
 

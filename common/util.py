@@ -42,7 +42,7 @@ def parse_opt():
     parser.add_argument('--epochs', type=int, default=16)
     parser.add_argument('--batch-size', type=int, default=128)
     parser.add_argument('--hidden-size', type=int, nargs='+', default=[16, 64, 128, 64, 16])
-    parser.add_argument('--weight-init-std', type=str, default='xavier')
+    parser.add_argument('--weight-init-std', type=str, default='he')
     parser.add_argument('--loads', action='store_true')
     parser.add_argument('--saves', action='store_true')
     parser.add_argument('--weight', type=str, default='./data/Conv/weight.pkl')
