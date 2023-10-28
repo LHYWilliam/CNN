@@ -14,6 +14,7 @@ def softmax(x):
         y = y.reshape(1, -1)
     y -= np.max(y, axis=1, keepdims=True)
     y = np.exp(y) / np.sum(np.exp(y), axis=1, keepdims=True)
+
     return y
 
 

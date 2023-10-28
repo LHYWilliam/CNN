@@ -121,7 +121,7 @@ def load_mnist(normalize=True, flatten=True, one_hot_label=False):
          for key in ('train_img', 'test_img'):
             dataset[key] = dataset[key].reshape(-1, 1, 28, 28)
 
-    return (dataset['train_img'], dataset['train_label'].astype(np.int32)), (dataset['test_img'], dataset['test_label'].astype(np.int32))
+    return (dataset['train_img'], dataset['train_label']), (dataset['test_img'], dataset['test_label'])
 
 
 if __name__ == '__main__':

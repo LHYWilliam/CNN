@@ -7,9 +7,9 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Affine:
-    def __init__(self, input_size, output_size, weight_init_std='he'):
-        self.W = eval(weight_init_std)(input_size) * np.random.randn(input_size, output_size)
-        self.b = eval(weight_init_std)(input_size) * np.random.randn(output_size)
+    def __init__(self, input_size, output_size, weight_init='he'):
+        self.W = eval(weight_init)(input_size) * np.random.randn(input_size, output_size)
+        self.b = eval(weight_init)(input_size) * np.random.randn(output_size)
         self.param = [self.W, self.b]
 
         self.dW, self.db = None, None
@@ -26,9 +26,9 @@ class Affine:
 
     def backward(self, dout):
         dx = np.dot(dout, self.W.T)
+
         self.dW = np.dot(self.x.T, dout)
         self.db = np.sum(dout, axis=0)
-
         self.grad = [self.dW, self.db]
 
         return dx
@@ -38,21 +38,22 @@ class Affine:
 
 
 class Convolution:
-    def __init__(self, filter_number, channel, filter_size, stride=1, pad=0, weight_init_std='he'):
-        self.W = eval(weight_init_std)(channel * filter_size * filter_size) * np.random.randn(filter_number, channel, filter_size, filter_size)
+    def __init__(self, filter_number, channel, filter_size, stride=1, pad=0, weight_init='he'):
+        self.W = (eval(weight_init)(channel * filter_size * filter_size) *
+                  np.random.randn(filter_number, channel, filter_size, filter_size))
         self.b = np.zeros(filter_number)
         self.param = [self.W, self.b]
+
+        self.stride, self.pad = stride, pad
 
         self.dW, self.db = None, None
         self.grad, self.acquire_grad = [], True
 
-        self.stride, self.pad = stride, pad
         self.x, self.col, self.col_W = None, None, None
 
     def forward(self, x, train=True):
         FN, C, FH, FW = self.W.shape
         N, C, H, W = x.shape
-
         out_h = 1 + int((H + 2 * self.pad - FH) / self.stride)
         out_w = 1 + int((W + 2 * self.pad - FW) / self.stride)
 
@@ -68,14 +69,13 @@ class Convolution:
 
     def backward(self, dout):
         FN, C, FH, FW = self.W.shape
+
         dout = dout.transpose(0, 2, 3, 1).reshape(-1, FN)
-
-        self.db, self.dW = np.sum(dout, axis=0), np.dot(self.col.T, dout)
-        self.dW = self.dW.transpose(1, 0).reshape(FN, C, FH, FW)
-
         dcol = np.dot(dout, self.col_W.T)
         dx = col2im(dcol, self.x.shape, FH, FW, self.stride, self.pad)
 
+        self.db, self.dW = np.sum(dout, axis=0), np.dot(self.col.T, dout)
+        self.dW = self.dW.transpose(1, 0).reshape(FN, C, FH, FW)
         self.grad += [self.dW, self.db]
 
         return dx
@@ -99,8 +99,8 @@ class Pooling:
 
         col = im2col(x, self.h, self.w, self.stride, self.pad)
         col = col.reshape(-1, self.h * self.w)
-
         arg_max = np.argmax(col, axis=1)
+
         out = np.max(col, axis=1)
         out = out.reshape(N, out_h, out_w, C).transpose(0, 3, 1, 2)
 
@@ -109,13 +109,12 @@ class Pooling:
         return out
 
     def backward(self, dout):
-        dout = dout.transpose(0, 2, 3, 1)
-
         pool_size = self.h * self.w
+
+        dout = dout.transpose(0, 2, 3, 1)
         dmax = np.zeros((dout.size, pool_size))
         dmax[np.arange(self.arg_max.size), self.arg_max.flatten()] = dout.flatten()
         dmax = dmax.reshape(dout.shape + (pool_size,))
-
         dcol = dmax.reshape(dmax.shape[0] * dmax.shape[1] * dmax.shape[2], -1)
         dx = col2im(dcol, self.x.shape, self.h, self.w, self.stride, self.pad)
 
@@ -167,6 +166,7 @@ class Sigmoid:
 
     def forward(self, x, train=True):
         out = sigmoid(x)
+
         self.out = out
 
         return out
@@ -191,13 +191,16 @@ class Dropout:
             return x * (1.0 - self.ratio)
 
     def backward(self, dout):
-        return dout * self.mask
+        dx = dout * self.mask
+
+        return dx
 
 
 class SoftmaxWithLoss:
     def __init__(self):
-        self.y, self.t = None, None
         self.acquire_grad = False
+
+        self.y, self.t = None, None
 
     def forward(self, x, t, train=True):
         self.y, self.t = softmax(x), t

@@ -1,5 +1,7 @@
+import os
 import pickle
 import argparse
+from pathlib import Path
 
 import numpy
 import cupy
@@ -38,25 +40,33 @@ def progress_bar(now, total, message='', break_line=False, bar=False):
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cfg', type=str, default=None)
-    parser.add_argument('--weight', type=str, default='.')
+    parser.add_argument('--weight', type=str, default=None)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--epochs', type=int, default=16)
     parser.add_argument('--batch-size', type=int, default=128)
     parser.add_argument('--weight-init', type=str, default='he')
     parser.add_argument('--nosave', action='store_true')
     parser.add_argument('--noplot', action='store_true')
-    parser.add_argument('--train-show-per-iter', '--train-show', type=int, default=16)
-    parser.add_argument('--test-show-per-iter', '--test-show', type=int, default=4)
+    parser.add_argument('--train-show-per-iter', '--train-show', type=int, default=1)
+    parser.add_argument('--test-show-per-iter', '--test-show', type=int, default=1)
     parser.add_argument('--seed', type=int, default=0)
 
     return parser.parse_args()
 
 
 def print_args(args):
-    print('Hype: ', end='')
+    print('\narguments: ', end='')
     for key, value in args.items():
         print(f'{key}:{value}', end='  ')
-    print()
+
+
+def print_cfg(layers):
+    print('\n\n---------------------------------------------------')
+    print("number    layer               param")
+    for number, layer_param in enumerate(layers):
+        layer, param = layer_param.values()
+        print(f'{number:<10}{layer:20}{param}')
+    print('---------------------------------------------------\n')
 
 
 def save(file, model, optimizer):
@@ -69,6 +79,22 @@ def load(file):
         model, optimizer = pickle.load(f)
 
     return model, optimizer
+
+
+def increment_path(path, sep=''):
+    path = Path(path)
+    if path.exists():
+        path, suffix = (path.with_suffix(''), path.suffix) if path.is_file() else (path, '')
+
+        for n in range(2, 9999):
+            p = f'{path}{sep}{n}{suffix}'
+            if not os.path.exists(p):
+                break
+        path = Path(p)
+
+    path.mkdir(parents=True, exist_ok=True)
+
+    return path
 
 
 def im2col(input_data, h, w, stride=1, pad=0):

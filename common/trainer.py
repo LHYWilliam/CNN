@@ -1,4 +1,5 @@
 import time
+from collections import deque
 
 import cupy as np
 
@@ -10,21 +11,23 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 class Trainer:
     def __init__(self, model, optimizer):
         self.model, self.optimizer = model, optimizer
-        self.train_show_per_iter, self.test_show_per_iter = None, None
 
-        self.epochs, self.train_iters, self.test_iters = 0, 0, 0
-        self.loss_list, self.train_accuracy_list, self.test_accuracy_list = [], [], []
+        self.epochs, self.train_iters, self.test_iters = None, None, None
 
     def train(self, train_loader, test_loader, epochs=16, batch_size=128,
-              train_show_per_iter=1, test_show_per_iter=1, noplot=False):
+              train_show=1, test_show=1, noplot=False):
+
         self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
-        self.train_show_per_iter, self.test_show_per_iter = train_show_per_iter, test_show_per_iter
+
+        total_iters_loss, train_epoch_accuracy, test_epoch_accuracy = [], [], []
+        iters_loss, train_iters_accuracy, test_iters_accuracy = deque(maxlen=10), deque(maxlen=10), deque(maxlen=10)
 
         for epoch in range(epochs):
-            total_loss, train_accu_count, test_total_accuracy = .0, 0, .0
 
+            total_loss, train_accu_count = .0, 0
             train_start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(train_loader):
+
                 y = self.model.forward(x_batch, train=True)
 
                 total_loss += self.model.loss(y, t_batch)
@@ -34,46 +37,63 @@ class Trainer:
                 self.optimizer.update()
                 self.optimizer.zero_grad()
 
-                if (iter + 1) % self.train_show_per_iter == 0 or iter + 1 == self.train_iters:
-                    interval_iter = self.train_show_per_iter if (iter + 1) % self.train_show_per_iter == 0 \
-                        else self.train_iters % self.train_show_per_iter
+                if (iter + 1) % train_show == 0 or iter + 1 == self.train_iters:
 
-                    average_loss = total_loss / interval_iter
-                    self.loss_list.append(average_loss)
-                    train_accuracy = train_accu_count / (batch_size * (iter + 1))
+                    interval_iter = train_show if (iter + 1) % train_show == 0 \
+                        else self.train_iters % train_show
 
-                    self._train_show(epoch, iter, average_loss, train_accuracy, train_start_time)
+                    total_iters_loss.append(total_loss / interval_iter)
+
+                    iters_loss.append(total_loss / interval_iter)
+                    train_iters_accuracy.append(train_accu_count / (batch_size * interval_iter))
+
+                    average_loss = sum(iters_loss) / len(iters_loss)
+                    train_average_accuracy = sum(train_iters_accuracy) / len(train_iters_accuracy)
+
+                    self._train_show(epoch, iter, average_loss, train_average_accuracy, train_start_time)
 
                     if iter + 1 == self.train_iters:
-                        self.train_accuracy_list.append(train_accuracy)
-                    total_loss = .0
+                        train_epoch_accuracy.append(train_average_accuracy)
 
+                    total_loss, train_accu_count = .0, .0
+
+            test_total_accuracy = .0
             test_start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(test_loader):
+
                 test_total_accuracy += self.model.accuracy(x_batch, t_batch)
 
-                if (iter + 1) % self.test_show_per_iter == 0 or iter + 1 == self.test_iters:
-                    test_accuracy = test_total_accuracy / (iter + 1)
+                if (iter + 1) % test_show == 0 or iter + 1 == self.test_iters:
 
-                    self._test_show(iter, test_accuracy, test_start_time)
+                    interval_iter = test_show if (iter + 1) % test_show == 0 \
+                        else self.train_iters % test_show
+
+                    test_iters_accuracy.append(test_total_accuracy / interval_iter)
+
+                    test_average_accuracy = sum(test_iters_accuracy) / len(train_iters_accuracy)
+
+                    self._test_show(iter, test_average_accuracy, test_start_time)
 
                     if iter + 1 == self.test_iters:
-                        self.test_accuracy_list.append(test_accuracy)
+                        test_epoch_accuracy.append(test_average_accuracy)
 
-        if noplot:
-            plots([self.loss_list], ['train loss'], f'iter * {self.train_show_per_iter}', 'loss')
-            plots([self.train_accuracy_list, self.test_accuracy_list], ['train accuracy', 'test accuracy'],
-                  f'iter * {self.train_show_per_iter}', 'accuracy')
+                    test_total_accuracy = .0
+
+        if not noplot:
+            plots([total_iters_loss], ['train loss'], f'iter * {train_show}', 'loss')
+            plots([train_epoch_accuracy, test_epoch_accuracy], ['train accuracy', 'test accuracy'],
+                  f'iter * {train_show}', 'accuracy')
 
     def _train_show(self, epoch, iter, average_loss, train_accuracy, start_time):
-        message = f'| epoch {epoch + 1:{len(str(self.epochs))}} ' \
-                  f'| train ' \
-                  f'| iter {iter + 1:{len(str(self.train_iters))}}/{self.train_iters} ' \
-                  f'| loss {average_loss:.4f} ' \
-                  f'| accuracy {train_accuracy:.4f} ' \
-                  f'| time {time.time() - start_time:.2f}s '
+        title = '     epoch |        mod |       iter |       loss |   accuracy |       time\n'
+        message = f'{epoch + 1:<{len(str(self.epochs))}}' \
+                  f'train' \
+                  f'{iter + 1:<{len(str(self.train_iters))}}/{self.train_iters}' \
+                  f'{average_loss:<.4f}' \
+                  f'{train_accuracy:<.4f}' \
+                  f'{time.time() - start_time:<.2f}s'
 
-        progress_bar(iter, self.train_iters, message=message, break_line=(iter + 1 == self.train_iters))
+        progress_bar(iter, self.train_iters, message=title + message, break_line=(iter + 1 == self.train_iters))
 
     def _test_show(self, iter, test_accuracy, start_time):
         epoch_blank = ' ' * len('| epoch ' + str(self.epochs) + ' ')

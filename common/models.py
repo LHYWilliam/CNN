@@ -57,7 +57,7 @@ class Linear(BaseModel):
 
         size_list = [input_size] + hidden_size_list + [class_number]
         for input_size, output_size in zip(size_list, size_list[1:]):
-            self.layers.append(Affine(input_size, output_size, weight_init_std=weight_init_std))
+            self.layers.append(Affine(input_size, output_size, weight_init=weight_init_std))
             if output_size != size_list[-1]:
                 self.layers.append(ReLu())
         self.loss_layer = SoftmaxWithLoss()
@@ -68,11 +68,12 @@ class Linear(BaseModel):
 
 
 class Convolutional(BaseModel):
-    def __init__(self, layer_params):
+    def __init__(self, cfg):
         super().__init__()
         self.layers, self.params, self.grads = [], [], []
+        self.cfg = cfg
 
-        for layer_param in layer_params:
+        for layer_param in cfg:
             self.layers.append(eval(layer_param['layer'])(*layer_param['param']))
         self.loss_layer = SoftmaxWithLoss()
 
