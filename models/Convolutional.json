@@ -21,8 +21,6 @@
 
   {"layer":"Affine", "param":[1024, 64, "he"]},
   {"layer":"ReLu", "param":[]},
-  {"layer":"Dropout", "param":[0.5]},
 
-  {"layer":"Affine", "param":[64, 10, "he"]},
-  {"layer":"Dropout", "param":[0.5]}
+  {"layer":"Affine", "param":[64, 10, "he"]}
 ]

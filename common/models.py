@@ -33,9 +33,9 @@ class BaseModel:
 
         return dx
 
-    def predict(self, x, train=False):
-        y = self.forward(x, train).argmax(axis=0) if x.ndim == 1 \
-            else self.forward(x, train).argmax(axis=1)
+    def predict(self, x):
+        y = self.forward(x, train=False).argmax(axis=0) if x.ndim == 1 \
+            else self.forward(x, train=False).argmax(axis=1)
 
         return y
 

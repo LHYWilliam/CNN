@@ -8,22 +8,24 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Trainer:
-    def __init__(self, model, optimizer, train_show_per_iter=64, test_show_per_iter=32):
+    def __init__(self, model, optimizer):
         self.model, self.optimizer = model, optimizer
-        self.train_show_per_iter, self.test_show_per_iter = train_show_per_iter, test_show_per_iter
+        self.train_show_per_iter, self.test_show_per_iter = None, None
 
         self.epochs, self.train_iters, self.test_iters = 0, 0, 0
         self.loss_list, self.train_accuracy_list, self.test_accuracy_list = [], [], []
 
-    def train(self, train_loader, test_loader, epochs=16, batch_size=128, plot=True):
+    def train(self, train_loader, test_loader, epochs=16, batch_size=128,
+              train_show_per_iter=1, test_show_per_iter=1, noplot=False):
         self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
+        self.train_show_per_iter, self.test_show_per_iter = train_show_per_iter, test_show_per_iter
 
         for epoch in range(epochs):
             total_loss, train_accu_count, test_total_accuracy = .0, 0, .0
 
             train_start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(train_loader):
-                y = self.model.forward(x_batch)
+                y = self.model.forward(x_batch, train=True)
 
                 total_loss += self.model.loss(y, t_batch)
                 train_accu_count += np.sum(y.argmax(axis=1) == t_batch).item()
@@ -58,7 +60,7 @@ class Trainer:
                     if iter + 1 == self.test_iters:
                         self.test_accuracy_list.append(test_accuracy)
 
-        if plot:
+        if noplot:
             plots([self.loss_list], ['train loss'], f'iter * {self.train_show_per_iter}', 'loss')
             plots([self.train_accuracy_list, self.test_accuracy_list], ['train accuracy', 'test accuracy'],
                   f'iter * {self.train_show_per_iter}', 'accuracy')

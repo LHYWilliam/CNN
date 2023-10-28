@@ -37,15 +37,16 @@ def progress_bar(now, total, message='', break_line=False, bar=False):
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', type=str, default='./models/Convolutional.json')
+    parser.add_argument('--cfg', type=str, default=None)
+    parser.add_argument('--weight', type=str, default='.')
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--epochs', type=int, default=16)
     parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--hidden-size', type=int, nargs='+', default=[16, 64, 128, 64, 16])
-    parser.add_argument('--weight-init-std', type=str, default='he')
-    parser.add_argument('--loads', action='store_true')
-    parser.add_argument('--saves', action='store_true')
-    parser.add_argument('--weight', type=str, default='./data/Conv/weight.pkl')
+    parser.add_argument('--weight-init', type=str, default='he')
+    parser.add_argument('--nosave', action='store_true')
+    parser.add_argument('--noplot', action='store_true')
+    parser.add_argument('--train-show-per-iter', '--train-show', type=int, default=16)
+    parser.add_argument('--test-show-per-iter', '--test-show', type=int, default=4)
     parser.add_argument('--seed', type=int, default=0)
 
     return parser.parse_args()

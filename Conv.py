@@ -14,17 +14,14 @@ from dataset.mnist import load_mnist
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 if __name__ == '__main__':
-    opt = vars(parse_opt())
-    print_args(opt)
-    cfg, lr, goal_epoch, batch_size, weight_init_std, loads, saves, weight, seed = \
-        (opt['cfg'], opt['lr'], opt['epochs'], opt['batch_size'],
-         opt['weight_init_std'], opt['loads'], opt['saves'], opt['weight'], opt['seed'])
+    opt = parse_opt()
+    print_args(vars(opt))
+    cfg, weight, lr, epochs, batch_size, weight_init, nosave, train_show_per_iter, test_show_per_iter, seed = \
+        (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
+         opt.weight_init, opt.nosave, opt.train_show_per_iter, opt.test_show_per_iter, opt.seed)
 
     numpy.random.seed(seed)
     np.random.seed(seed)
-
-    with open(cfg) as f:
-        cfg = json.load(f)
 
     (x_train, t_train), (x_test, t_test) = load_mnist(flatten=False)
     x_train, t_train, x_test, t_test = to_gpu(x_train, t_train, x_test, t_test)
@@ -32,14 +29,19 @@ if __name__ == '__main__':
     test_loader = DataLoader(x_test, t_test, batch_size)
 
     channel, input_size, class_number = x_train[1], x_train.shape[2], 10
-    if loads:
+    if weight:
         model, optimizer = load(weight)
-    else:
+    elif cfg:
+        with open(cfg) as f:
+            cfg = json.load(f)
         model = Convolutional(cfg)
         optimizer = Adam(model=model, lr=lr)
+    else:
+        exit(code=1)
 
     trainer = Trainer(model, optimizer)
-    trainer.train(train_loader, test_loader, epochs=goal_epoch, batch_size=batch_size)
+    trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size,
+                  train_show_per_iter=train_show_per_iter, test_show_per_iter=test_show_per_iter)
 
-    if saves:
+    if not nosave:
         save(weight, model, optimizer)
