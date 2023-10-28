@@ -5,7 +5,7 @@ import cupy as np
 
 from common.optimizer import Adam
 from common.trainer import Trainer
-from common.models import Convolutional
+from common.models import Model
 from common.dataloader import DataLoader
 from common.util import (parse_opt, print_args, print_cfg, load, save, increment_path, to_gpu)
 
@@ -34,10 +34,10 @@ def main(opt):
         with open(cfg) as f:
             cfg = json.load(f)
         print_cfg(cfg)
-        model = Convolutional(cfg)
+        model = Model(cfg)
         optimizer = Adam(model=model, lr=lr)
     else:
-        exit(code=1)
+        return
 
     trainer = Trainer(model, optimizer)
     trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size,

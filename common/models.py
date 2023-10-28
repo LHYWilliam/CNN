@@ -9,6 +9,11 @@ class BaseModel:
     def __init__(self):
         self.layers, self.loss_layer, self.grads = None, None, None
 
+    def __call__(self, x):
+        y = self.forward(x)
+
+        return y
+
     def forward(self, x, train=True):
         out = x
         for layer in self.layers:
@@ -50,14 +55,14 @@ class BaseModel:
 
 
 class Linear(BaseModel):
-    def __init__(self, input_size, hidden_size_list, class_number, weight_init_std='xavier'):
+    def __init__(self, input_size, hidden_size_list, class_number, weight_init='he'):
         super().__init__()
         self.input_size, self.hidden_size_list, self.class_number = input_size, hidden_size_list, class_number
         self.layers, self.params, self.grads = [], [], []
 
         size_list = [input_size] + hidden_size_list + [class_number]
         for input_size, output_size in zip(size_list, size_list[1:]):
-            self.layers.append(Affine(input_size, output_size, weight_init=weight_init_std))
+            self.layers.append(Affine(input_size, output_size, weight_init=weight_init))
             if output_size != size_list[-1]:
                 self.layers.append(ReLu())
         self.loss_layer = SoftmaxWithLoss()
@@ -67,11 +72,11 @@ class Linear(BaseModel):
                 self.params += layer.param
 
 
-class Convolutional(BaseModel):
+class Model(BaseModel):
     def __init__(self, cfg):
         super().__init__()
-        self.layers, self.params, self.grads = [], [], []
         self.cfg = cfg
+        self.layers, self.params, self.grads = [], [], []
 
         for layer_param in cfg:
             self.layers.append(eval(layer_param['layer'])(*layer_param['param']))
