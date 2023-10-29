@@ -48,7 +48,7 @@ def parse_opt():
     parser.add_argument('--nosave', action='store_true')
     parser.add_argument('--noplot', action='store_true')
     parser.add_argument('--early-break', action='store_true')
-    parser.add_argument('--save-path', type=str, default=None)
+    parser.add_argument('--project', type=str, default=None)
     parser.add_argument('--train-show-per-iter', '--train-show', type=int, default=1)
     parser.add_argument('--test-show-per-iter', '--test-show', type=int, default=1)
     parser.add_argument('--seed', type=int, default=0)
@@ -63,27 +63,25 @@ def print_args(args):
 
 
 def print_cfg(layers):
-    print('\n')
-    print("number    layer               param")
+    print("\n\nnumber    layer               param")
     for number, layer_param in enumerate(layers):
         layer, param = layer_param.values()
         print(f'{number:<10}{layer:20}{param}')
-    print()
 
 
-def save(file, model, optimizer):
+def save(file, weight):
     with open(file, 'wb') as f:
-        pickle.dump((model, optimizer), f)
+        pickle.dump(weight, f)
 
 
 def load(file):
     with open(file, 'rb') as f:
-        model, optimizer = pickle.load(f)
+        weight = pickle.load(f)
 
-    return model, optimizer
+    return weight
 
 
-def increment_path(path, sep=''):
+def increment_path(path, sep='', mkdir=True):
     path = Path(path)
     if path.exists():
         path, suffix = (path.with_suffix(''), path.suffix) if path.is_file() else (path, '')
@@ -93,8 +91,8 @@ def increment_path(path, sep=''):
             if not os.path.exists(p):
                 break
         path = Path(p)
-
-    path.mkdir(parents=True, exist_ok=True)
+    if mkdir:
+        path.mkdir(parents=True, exist_ok=True)
 
     return path
 

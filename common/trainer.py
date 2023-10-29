@@ -3,7 +3,7 @@ from collections import deque
 
 import cupy as np
 
-from common.util import (plots, progress_bar, save)
+from common.util import (plots, progress_bar, save, to_cpu)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
@@ -15,7 +15,7 @@ class Trainer:
         self.epochs, self.train_iters, self.test_iters = None, None, None
 
     def train(self, train_loader, test_loader, epochs=16, batch_size=128,
-              train_show=1, test_show=1, nosave=False, noplot=False, early_break=False, save_path=None):
+              train_show=1, test_show=1, nosave=False, noplot=False, early_break=False, project=None):
 
         self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
 
@@ -85,9 +85,21 @@ class Trainer:
                     test_total_accuracy = .0
 
             if not nosave:
-                save(save_path / 'last.pkl', self.model, self.optimizer)
+                weight = {
+                    'cfg': self.model.cfg,
+                    'epoch': epoch + 1,
+                    'params': to_cpu(*self.model.params),
+
+                    'lr': self.optimizer.lr,
+                    'beta1': self.optimizer.beta1,
+                    'beta2': self.optimizer.beta2,
+                    'iter': self.optimizer.iter,
+                    'm': to_cpu(*self.optimizer.m),
+                    'v': to_cpu(*self.optimizer.v)
+                }
+                save(project / 'last.pkl', weight)
                 if test_average_accuracy > test_best_accuracy:
-                    save(save_path / 'best.pkl', self.model, self.optimizer)
+                    save(project / 'best.pkl', weight)
 
             test_best_accuracy = max(test_average_accuracy, test_best_accuracy)
 

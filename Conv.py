@@ -15,12 +15,12 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 def main(opt):
-    (cfg, weight, lr, epochs, batch_size, weight_init, nosave, noplot, early_break, save_path,
+    (cfg, weight, lr, epochs, batch_size, weight_init, nosave, noplot, early_break, project,
      train_show_per_iter, test_show_per_iter, seed) = (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
                                                        opt.weight_init, opt.nosave, opt.noplot, opt.early_break,
-                                                       opt.save_path, opt.train_show_per_iter, opt.test_show_per_iter,
+                                                       opt.project, opt.train_show_per_iter, opt.test_show_per_iter,
                                                        opt.seed)
-    save_path = increment_path('data/Conv') if not save_path and not nosave else save_path
+    project = increment_path('data/Conv', mkdir=not nosave) if not project and not nosave else project
 
     numpy.random.seed(seed)
     np.random.seed(seed)
@@ -31,7 +31,12 @@ def main(opt):
     test_loader = DataLoader(x_test, t_test, batch_size)
 
     if weight:
-        model, optimizer = load(weight)
+        weight = load(weight)
+        model = Model(weight['cfg'])
+        model.load_params(to_gpu(*weight['params']))
+        optimizer = Adam(model=model, lr=weight['lr'], beta1=weight['beta1'], beta2=weight['beta2'])
+        optimizer.m = to_gpu(*weight['m'])
+        optimizer.v = to_gpu(*weight['v'])
         print_cfg(model.cfg)
     elif cfg:
         with open(cfg) as f:
@@ -45,7 +50,7 @@ def main(opt):
     trainer = Trainer(model, optimizer)
     trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size, train_show=train_show_per_iter,
                   test_show=test_show_per_iter, nosave=nosave, noplot=noplot, early_break=early_break,
-                  save_path=save_path)
+                  project=project)
 
 
 if __name__ == '__main__':
