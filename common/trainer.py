@@ -15,12 +15,13 @@ class Trainer:
         self.epochs, self.train_iters, self.test_iters = None, None, None
 
     def train(self, train_loader, test_loader, epochs=16, batch_size=128,
-              train_show=1, test_show=1, nosave=False, noplot=False, save_path=None):
+              train_show=1, test_show=1, nosave=False, noplot=False, early_break=False, save_path=None):
 
         self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
 
-        total_iters_loss, train_epoch_accuracy, test_epoch_accuracy = [], [], []
+        total_iters_loss, train_epochs_accuracy, test_epochs_accuracy = [], [], []
         iters_loss, train_iters_accuracy, test_iters_accuracy = deque(maxlen=10), deque(maxlen=10), deque(maxlen=10)
+        test_10epochs_accuracy = deque(maxlen=10)
 
         for epoch in range(epochs):
 
@@ -56,11 +57,11 @@ class Trainer:
                     self._train_show(epoch, epochs, iter, average_loss, train_average_accuracy, train_start_time)
 
                     if iter + 1 == self.train_iters:
-                        train_epoch_accuracy.append(train_average_accuracy)
+                        train_epochs_accuracy.append(train_average_accuracy)
 
                     total_loss, train_accu_count = .0, .0
 
-            test_total_accuracy = .0
+            test_total_accuracy, test_average_accuracy, test_best_accuracy = .0, .0, .0
             test_start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(test_loader):
 
@@ -78,18 +79,24 @@ class Trainer:
                     self._test_show(iter, test_average_accuracy, test_start_time)
 
                     if iter + 1 == self.test_iters:
-                        test_epoch_accuracy.append(test_average_accuracy)
+                        test_epochs_accuracy.append(test_average_accuracy)
+                        test_10epochs_accuracy.append(test_average_accuracy)
+                        test_best_accuracy = max(test_average_accuracy, test_best_accuracy)
 
                     test_total_accuracy = .0
 
-            print()
-
             if not nosave:
-                save(save_path, self.model, self.optimizer)
+                save(save_path / 'last.pkl', self.model, self.optimizer)
+                if test_average_accuracy > test_best_accuracy:
+                    save(save_path / 'best.pkl', self.model, self.optimizer)
+
+            if early_break and max(test_10epochs_accuracy) < test_best_accuracy:
+                print(f'early break at epoch{epoch + 1}')
+                break
 
         if not noplot:
             plots([total_iters_loss], ['train loss'], f'iter * {train_show}', 'loss')
-            plots([train_epoch_accuracy, test_epoch_accuracy], ['train accuracy', 'test accuracy'],
+            plots([train_epochs_accuracy, test_epochs_accuracy], ['train accuracy', 'test accuracy'],
                   f'iter * {train_show}', 'accuracy')
 
     def _train_show(self, epoch, epochs, iter, average_loss, train_accuracy, start_time):

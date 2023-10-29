@@ -47,6 +47,7 @@ def parse_opt():
     parser.add_argument('--weight-init', type=str, default='he')
     parser.add_argument('--nosave', action='store_true')
     parser.add_argument('--noplot', action='store_true')
+    parser.add_argument('--early-break', action='store_true')
     parser.add_argument('--save-path', type=str, default=None)
     parser.add_argument('--train-show-per-iter', '--train-show', type=int, default=1)
     parser.add_argument('--test-show-per-iter', '--test-show', type=int, default=1)
@@ -71,7 +72,7 @@ def print_cfg(layers):
 
 
 def save(file, model, optimizer):
-    with open(file, 'wb') as f:
+    with open(file, 'wb+') as f:
         pickle.dump((model, optimizer), f)
 
 

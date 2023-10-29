@@ -15,11 +15,12 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 def main(opt):
-    (cfg, weight, lr, epochs, batch_size, weight_init, nosave, noplot, save_path,
+    (cfg, weight, lr, epochs, batch_size, weight_init, nosave, noplot, early_break, save_path,
      train_show_per_iter, test_show_per_iter, seed) = (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
-                                                       opt.weight_init, opt.nosave, opt.noplot, opt.save_path,
-                                                       opt.train_show_per_iter, opt.test_show_per_iter, opt.seed)
-    save_path = increment_path('data/Conv') / 'weight.pkl' if not save_path else save_path
+                                                       opt.weight_init, opt.nosave, opt.noplot, opt.early_break,
+                                                       opt.save_path, opt.train_show_per_iter, opt.test_show_per_iter,
+                                                       opt.seed)
+    save_path = increment_path('data/Conv') if not save_path else save_path
 
     numpy.random.seed(seed)
     np.random.seed(seed)
@@ -42,8 +43,8 @@ def main(opt):
         return
 
     trainer = Trainer(model, optimizer)
-    trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size,
-                  train_show=train_show_per_iter, test_show=test_show_per_iter, nosave=nosave, noplot=noplot,
+    trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size, train_show=train_show_per_iter,
+                  test_show=test_show_per_iter, nosave=nosave, noplot=noplot, early_break=early_break,
                   save_path=save_path)
 
 
