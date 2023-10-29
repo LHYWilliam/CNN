@@ -15,7 +15,7 @@ class Trainer:
         self.epochs, self.train_iters, self.test_iters = None, None, None
 
     def train(self, train_loader, test_loader, epochs=16, batch_size=128,
-              train_show=1, test_show=1, noplot=False, save_path=None):
+              train_show=1, test_show=1, nosave=False, noplot=False, save_path=None):
 
         self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
 
@@ -84,7 +84,7 @@ class Trainer:
 
             print()
 
-            if save_path:
+            if not nosave:
                 save(save_path, self.model, self.optimizer)
 
         if not noplot:

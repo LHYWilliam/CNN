@@ -15,9 +15,11 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 def main(opt):
-    cfg, weight, lr, epochs, batch_size, weight_init, nosave, noplot, train_show_per_iter, test_show_per_iter, seed = \
-        (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
-         opt.weight_init, opt.nosave, opt.noplot, opt.train_show_per_iter, opt.test_show_per_iter, opt.seed)
+    (cfg, weight, lr, epochs, batch_size, weight_init, nosave, noplot, save_path,
+     train_show_per_iter, test_show_per_iter, seed) = (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
+                                                       opt.weight_init, opt.nosave, opt.noplot, opt.save_path,
+                                                       opt.train_show_per_iter, opt.test_show_per_iter, opt.seed)
+    save_path = increment_path('data/Conv') / 'weight.pkl' if not save_path else save_path
 
     numpy.random.seed(seed)
     np.random.seed(seed)
@@ -26,8 +28,6 @@ def main(opt):
     x_train, t_train, x_test, t_test = to_gpu(x_train, t_train, x_test, t_test)
     train_loader = DataLoader(x_train, t_train, batch_size)
     test_loader = DataLoader(x_test, t_test, batch_size)
-
-    save_path = increment_path('data/train') / 'weight.pkl'
 
     if weight:
         model, optimizer = load(weight)
@@ -43,10 +43,8 @@ def main(opt):
 
     trainer = Trainer(model, optimizer)
     trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size,
-                  train_show=train_show_per_iter, test_show=test_show_per_iter, noplot=noplot, save_path=save_path)
-
-    if not nosave:
-        save(save_path, model, optimizer)
+                  train_show=train_show_per_iter, test_show=test_show_per_iter, nosave=nosave, noplot=noplot,
+                  save_path=save_path)
 
 
 if __name__ == '__main__':
