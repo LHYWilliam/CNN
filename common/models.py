@@ -89,5 +89,5 @@ class Model(BaseModel):
     def load_params(self, params):
         params = iter(params)
         for layer in (layer for layer in self.layers if layer.acquire_grad):
-            for i in range(len(layer.param)):
-                layer.param[i] = next(params)
+            layer.W = next(params)
+            layer.b = next(params)
