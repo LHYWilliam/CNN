@@ -28,7 +28,7 @@ class Trainer:
             total_loss, train_accu_count = .0, 0
             train_start_time = time.time()
 
-            print('     epoch       mod           iter          loss     accuracy        time')
+            print('\n     epoch       mod           iter          loss     accuracy        time')
 
             for iter, (x_batch, t_batch) in enumerate(train_loader):
 
@@ -81,7 +81,6 @@ class Trainer:
                     if iter + 1 == self.test_iters:
                         test_epochs_accuracy.append(test_average_accuracy)
                         test_10epochs_accuracy.append(test_average_accuracy)
-                        test_best_accuracy = max(test_average_accuracy, test_best_accuracy)
 
                     test_total_accuracy = .0
 
@@ -89,6 +88,8 @@ class Trainer:
                 save(save_path / 'last.pkl', self.model, self.optimizer)
                 if test_average_accuracy > test_best_accuracy:
                     save(save_path / 'best.pkl', self.model, self.optimizer)
+
+            test_best_accuracy = max(test_average_accuracy, test_best_accuracy)
 
             if early_break and max(test_10epochs_accuracy) < test_best_accuracy:
                 print(f'early break at epoch{epoch + 1}')

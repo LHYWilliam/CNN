@@ -72,6 +72,9 @@ def print_cfg(layers):
 
 
 def save(file, model, optimizer):
+    if file.exists():
+        os.system(f'rm -r {str(file)}')
+
     with open(file, 'wb+') as f:
         pickle.dump((model, optimizer), f)
 
