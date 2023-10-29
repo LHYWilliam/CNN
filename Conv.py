@@ -20,7 +20,7 @@ def main(opt):
                                                        opt.weight_init, opt.nosave, opt.noplot, opt.early_break,
                                                        opt.save_path, opt.train_show_per_iter, opt.test_show_per_iter,
                                                        opt.seed)
-    save_path = increment_path('data/Conv') if not save_path else save_path
+    save_path = increment_path('data/Conv') if not save_path and not nosave else save_path
 
     numpy.random.seed(seed)
     np.random.seed(seed)
