@@ -83,5 +83,9 @@ class Adam:
 
             self.params[index] -= lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)
 
+    def load(self, params):
+        self.m = params[0]
+        self.v = params[1]
+
     def zero_grad(self):
         self.grads.clear()

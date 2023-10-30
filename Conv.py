@@ -31,19 +31,18 @@ def main(opt):
     test_loader = DataLoader(x_test, t_test, batch_size)
 
     if weight:
-        weight = load(weight)
-        model = Model(weight['cfg'])
-        model.load_params(to_gpu(*weight['params']))
-        optimizer = Adam(model=model, lr=weight['lr'], beta1=weight['beta1'], beta2=weight['beta2'])
-        optimizer.m = to_gpu(*weight['m'])
-        optimizer.v = to_gpu(*weight['v'])
+        checkpoint = load(weight)
+        model = Model(checkpoint['cfg'])
+        model.load(to_gpu(*checkpoint['params']))
+        optimizer = Adam(model=model, lr=checkpoint['lr'], beta1=checkpoint['beta1'], beta2=checkpoint['beta2'])
+        optimizer.load([to_gpu(*checkpoint['m']), to_gpu(*checkpoint['v'])])
         print_cfg(model.cfg)
     elif cfg:
         with open(cfg) as f:
             cfg = json.load(f)
-        print_cfg(cfg)
         model = Model(cfg)
         optimizer = Adam(model=model, lr=lr)
+        print_cfg(cfg)
     else:
         return
 

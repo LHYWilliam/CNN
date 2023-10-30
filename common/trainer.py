@@ -85,7 +85,7 @@ class Trainer:
                     test_total_accuracy = .0
 
             if not nosave:
-                weight = {
+                checkpoint = {
                     'cfg': self.model.cfg,
                     'epoch': epoch + 1,
                     'params': to_cpu(*self.model.params),
@@ -97,9 +97,9 @@ class Trainer:
                     'm': to_cpu(*self.optimizer.m),
                     'v': to_cpu(*self.optimizer.v)
                 }
-                save(project / 'last.pkl', weight)
+                save(project / 'last.pkl', checkpoint)
                 if test_average_accuracy > test_best_accuracy:
-                    save(project / 'best.pkl', weight)
+                    save(project / 'best.pkl', checkpoint)
 
             test_best_accuracy = max(test_average_accuracy, test_best_accuracy)
 

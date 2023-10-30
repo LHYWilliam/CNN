@@ -59,7 +59,7 @@ def parse_opt():
 def print_args(args):
     print('\narguments: ', end='')
     for key, value in args.items():
-        print(f'{key}:{value}', end='  ')
+        print(f'{key}:{value}', end='  ', flush=True)
 
 
 def print_cfg(layers):
@@ -69,19 +69,19 @@ def print_cfg(layers):
         print(f'{number:<10}{layer:20}{param}')
 
 
-def save(file, weight):
+def save(file, checkpoint):
     with open(file, 'wb') as f:
-        pickle.dump(weight, f)
+        pickle.dump(checkpoint, f)
 
 
 def load(file):
     with open(file, 'rb') as f:
-        weight = pickle.load(f)
+        checkpoint = pickle.load(f)
 
-    return weight
+    return checkpoint
 
 
-def increment_path(path, sep='', mkdir=True):
+def increment_path(path, sep='', mkdir=True, exist_ok=True):
     path = Path(path)
     if path.exists():
         path, suffix = (path.with_suffix(''), path.suffix) if path.is_file() else (path, '')
@@ -92,7 +92,7 @@ def increment_path(path, sep='', mkdir=True):
                 break
         path = Path(p)
     if mkdir:
-        path.mkdir(parents=True, exist_ok=True)
+        path.mkdir(parents=True, exist_ok=exist_ok)
 
     return path
 
