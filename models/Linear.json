@@ -1,0 +1,14 @@
+[
+    {"layer":"Flatten", "param":[]},
+
+    {"layer":"Affine", "param":[784, 16, "he"]},
+    {"layer":"ReLu", "param":[]},
+
+    {"layer":"Affine", "param":[16, 64, "he"]},
+    {"layer":"ReLu", "param":[]},
+
+    {"layer":"Affine", "param":[64, 128, "he"]},
+    {"layer":"ReLu", "param":[]},
+
+    {"layer":"Affine", "param":[128, 10, "he"]}
+]
