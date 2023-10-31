@@ -1,6 +1,6 @@
 import cupy as np
 
-from common.layers import (Affine, Convolution, Pooling, Flatten, ReLu, Dropout, SoftmaxWithLoss)  # DO NOT MOVE
+from common.layers import (Affine, Convolution, Pooling, Flatten, ReLu, BatchNormalization, Dropout, SoftmaxWithLoss)  # DO NOT MOVE
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
@@ -87,8 +87,5 @@ class Model(BaseModel):
                 self.params += layer.param
 
     def load(self, params):
-        params.reverse()
-        for param in self.params:
-            if param.shape == params[-1].shape:
-                param[...] = params[-1]
-                params.pop()
+        for self_param, param in zip(self.params, params):
+            self_param[...] = param

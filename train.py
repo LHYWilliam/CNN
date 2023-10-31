@@ -7,7 +7,7 @@ from common.optimizer import Adam
 from common.trainer import Trainer
 from common.models import Model
 from common.dataloader import DataLoader
-from common.util import (parse_opt, print_args, print_cfg, load, save, increment_path, to_gpu)
+from common.util import (parse_opt, print_args, print_cfg, load, increment_path, to_gpu)
 
 from dataset.mnist import load_mnist
 

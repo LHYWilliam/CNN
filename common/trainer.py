@@ -54,7 +54,7 @@ class Trainer:
                     average_loss = sum(iters_loss) / len(iters_loss)
                     train_average_accuracy = sum(train_iters_accuracy) / len(train_iters_accuracy)
 
-                    self._train_show(epoch, epochs, iter, average_loss, train_average_accuracy, train_start_time)
+                    self.__train_show(epoch, epochs, iter, average_loss, train_average_accuracy, train_start_time)
 
                     if iter + 1 == self.train_iters:
                         train_epochs_accuracy.append(train_average_accuracy)
@@ -76,7 +76,7 @@ class Trainer:
 
                     test_average_accuracy = sum(test_iters_accuracy) / len(train_iters_accuracy)
 
-                    self._test_show(iter, test_average_accuracy, test_start_time)
+                    self.__test_show(iter, test_average_accuracy, test_start_time)
 
                     if iter + 1 == self.test_iters:
                         test_epochs_accuracy.append(test_average_accuracy)
@@ -112,7 +112,7 @@ class Trainer:
             plots([train_epochs_accuracy, test_epochs_accuracy], ['train accuracy', 'test accuracy'],
                   f'iter * {train_show}', 'accuracy')
 
-    def _train_show(self, epoch, epochs, iter, average_loss, train_accuracy, start_time):
+    def __train_show(self, epoch, epochs, iter, average_loss, train_accuracy, start_time):
         epoch_bar = f'{epoch + 1}/{epochs}'
         iter_bar = f'{iter + 1}/{self.train_iters}'
 
@@ -125,7 +125,7 @@ class Trainer:
 
         progress_bar(iter, self.train_iters, message=message, break_line=(iter + 1 == self.train_iters))
 
-    def _test_show(self, iter, test_accuracy, start_time):
+    def __test_show(self, iter, test_accuracy, start_time):
         epoch_blank = ' ' * 10
         loss_blank = ' ' * 14
 
