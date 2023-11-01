@@ -38,10 +38,10 @@ class Affine:
 
 
 class Convolution:
-    def __init__(self, filter_number, channel, filter_size, stride=1, pad=0, weight_init='he'):
-        self.W = (eval(weight_init)(channel * filter_size * filter_size) *
-                  np.random.randn(filter_number, channel, filter_size, filter_size))
-        self.b = np.zeros(filter_number)
+    def __init__(self, out_channel, input_channel, filter_size, stride=1, pad=0, weight_init='he'):
+        self.W = (eval(weight_init)(input_channel * filter_size * filter_size) *
+                  np.random.randn(out_channel, input_channel, filter_size, filter_size))
+        self.b = np.zeros(out_channel)
         self.param = [self.W, self.b]
 
         self.stride, self.pad = stride, pad

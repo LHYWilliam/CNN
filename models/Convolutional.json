@@ -5,7 +5,7 @@
   {"layer":"Convolution", "param":[16, 16, 3, 1, 1]},
   {"layer":"BatchNormalization", "param":[12544]},
   {"layer":"ReLu", "param":[]},
-  {"layer":"Pooling", "param":[2, 2, 2, 0]},
+  {"layer":"Convolution", "param":[16, 16, 2, 2, 0]},
 
   {"layer":"Convolution", "param":[32, 16, 3, 1, 1]},
   {"layer":"BatchNormalization", "param":[6272]},
@@ -13,7 +13,7 @@
   {"layer":"Convolution", "param":[32, 32, 3, 1, 2]},
   {"layer":"BatchNormalization", "param":[8192]},
   {"layer":"ReLu", "param":[]},
-  {"layer":"Pooling", "param":[2, 2, 2, 0]},
+  {"layer":"Convolution", "param":[32, 32, 2, 2, 0]},
 
   {"layer":"Convolution", "param":[64, 32, 3, 1, 1]},
   {"layer":"BatchNormalization", "param":[4096]},
@@ -21,13 +21,15 @@
   {"layer":"Convolution", "param":[64, 64, 3, 1, 1]},
   {"layer":"BatchNormalization", "param":[4096]},
   {"layer":"ReLu", "param":[]},
-  {"layer":"Pooling", "param":[2, 2, 2, 0]},
+  {"layer":"Convolution", "param":[64, 64, 2, 2, 0]},
 
-  {"layer":"Flatten", "param":[]},
+  {"layer":"Convolution", "param":[1024, 64, 4, 4, 0]},
 
-  {"layer":"Affine", "param":[1024, 64, "he"]},
+  {"layer":"Convolution", "param":[64, 1024, 1, 1, 0]},
   {"layer":"BatchNormalization", "param":[64]},
   {"layer":"ReLu", "param":[]},
 
-  {"layer":"Affine", "param":[64, 10, "he"]}
+  {"layer":"Convolution", "param":[10, 64, 1, 1, 0]},
+
+  {"layer":"Flatten", "param":[]}
 ]
