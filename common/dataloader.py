@@ -7,15 +7,19 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 class DataLoader:
     def __init__(self, train, test, batch_size, shuffle=True):
         self.train, self.test = train, test
-        self.total_size, self.batch_size = self.train.shape[0], batch_size
+        self.batch_size, self.ifshuffle = batch_size, shuffle
+
+        self.total_size = self.train.shape[0]
+        self.length = int(self.total_size / self.batch_size)
+        
 
         self.iter = -1
 
-        if shuffle:
+        if self.ifshuffle:
             self.shuffle()
 
     def __len__(self):
-        return int(self.total_size / self.batch_size)
+        return self.length
 
     def __getitem__(self, iter):
         begin, end = iter * self.batch_size, (iter + 1) * self.batch_size
@@ -30,7 +34,8 @@ class DataLoader:
             return self[self.iter]
         else:
             self.iter = -1
-            self.shuffle()
+            if self.ifshuffle:
+                self.shuffle()
             raise StopIteration
 
     def shuffle(self):

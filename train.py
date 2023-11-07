@@ -45,8 +45,8 @@ def main(opt):
     else:
         return
 
-    trainer = Trainer(model, optimizer)
-    trainer.train(train_loader, test_loader, epochs=epochs, batch_size=batch_size, train_show=train_show_per_iter,
+    trainer = Trainer(model, optimizer, train_loader, test_loader)
+    trainer.train(epochs=epochs, batch_size=batch_size, train_show=train_show_per_iter,
                   test_show=test_show_per_iter, nosave=nosave, noplot=noplot, early_break=early_break, project=project)
 
 

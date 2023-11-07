@@ -9,15 +9,16 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Trainer:
-    def __init__(self, model, optimizer):
+    def __init__(self, model, optimizer, train_loader, test_loader):
         self.model, self.optimizer = model, optimizer
+        self.train_loader, self.test_loader = train_loader, test_loader
 
-        self.epochs, self.train_iters, self.test_iters = None, None, None
+        self.train_iters, self.test_iters = None, None
 
-    def train(self, train_loader, test_loader, epochs=16, batch_size=128,
+    def train(self, epochs=16, batch_size=128,
               train_show=1, test_show=1, nosave=False, noplot=False, early_break=False, project=None):
 
-        self.epochs, self.train_iters, self.test_iters = epochs, len(train_loader), len(test_loader)
+        self.train_iters, self.test_iters = len(self.train_loader), len(self.test_loader)
 
         total_iters_loss, train_epochs_accuracy, test_epochs_accuracy = [], [], []
         iters_loss, train_iters_accuracy, test_iters_accuracy = deque(maxlen=10), deque(maxlen=10), deque(maxlen=10)
@@ -30,7 +31,7 @@ class Trainer:
 
             print('\n     epoch       mod           iter          loss     accuracy        time')
 
-            for iter, (x_batch, t_batch) in enumerate(train_loader):
+            for iter, (x_batch, t_batch) in enumerate(self.train_loader):
 
                 y = self.model.forward(x_batch, train=True)
 
@@ -63,7 +64,7 @@ class Trainer:
 
             test_total_accuracy, test_average_accuracy, test_best_accuracy = .0, .0, .0
             test_start_time = time.time()
-            for iter, (x_batch, t_batch) in enumerate(test_loader):
+            for iter, (x_batch, t_batch) in enumerate(self.test_loader):
 
                 test_total_accuracy += self.model.accuracy(x_batch, t_batch)
 
