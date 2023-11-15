@@ -1,5 +1,7 @@
 import json
 
+from pathlib import Path
+
 import numpy
 import cupy as np
 
@@ -19,7 +21,7 @@ def main(opt):
      train_show_per_iter, test_show_per_iter, seed) = (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
                                                        opt.nosave, opt.noplot, opt.early_break, opt.project,
                                                        opt.train_show_per_iter, opt.test_show_per_iter, opt.seed)
-    project = increment_path('data/train', mkdir=not nosave) if not project and not nosave else project
+    project = increment_path('runs/train', mkdir=not nosave) if (not project and not nosave) else Path(project)
 
     numpy.random.seed(seed)
     np.random.seed(seed)

@@ -12,7 +12,6 @@ class DataLoader:
         self.total_size = self.train.shape[0]
         self.length = int(self.total_size / self.batch_size)
         
-
         self.iter = -1
 
         if self.ifshuffle:

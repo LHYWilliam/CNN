@@ -24,10 +24,7 @@ class Momentum:
 
     def update(self):
         if self.v is None:
-            self.v = []
-
-            for param in self.params:
-                self.v.append(np.zeros_like(param))
+            self.v = [np.zeros_like(param) for param in self.params]
 
         for index in range(len(self.params)):
             self.v[index] = self.momentum * self.v[index] - self.lr * self.grads[index]
@@ -46,10 +43,7 @@ class AdaGrad:
 
     def update(self, basis=1e-7):
         if self.h is None:
-            self.h = []
-
-            for param in self.params:
-                self.h.append(np.zeros_like(param))
+            self.h = [np.zeros_like(param) for param in self.params]
 
         for index in range(len(self.params)):
             self.h[index] += self.grads[index] * self.grads[index]
@@ -68,11 +62,8 @@ class Adam:
 
     def update(self, basis=1e-7):
         if self.m is None:
-            self.m, self.v = [], []
-
-            for param in self.params:
-                self.m.append(np.zeros_like(param))
-                self.v.append(np.zeros_like(param))
+            self.m = [np.zeros_like(param) for param in self.params]
+            self.v = [np.zeros_like(param) for param in self.params]
 
         self.iter += 1
         lr_t = self.lr * np.sqrt(1.0 - self.beta2 ** self.iter) / (1.0 - self.beta1 ** self.iter)
@@ -84,8 +75,7 @@ class Adam:
             self.params[index] -= lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)
 
     def load(self, params):
-        self.m = params[0]
-        self.v = params[1]
+        self.m, self.v = params
 
     def zero_grad(self):
         self.grads.clear()

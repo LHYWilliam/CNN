@@ -38,7 +38,7 @@ class Affine:
 
 
 class Convolution:
-    def __init__(self, out_channel, input_channel, filter_size, stride=1, pad=0, weight_init='he'):
+    def __init__(self, input_channel, out_channel, filter_size, stride=1, pad=0, weight_init='he'):
         self.W = (eval(weight_init)(input_channel * filter_size * filter_size) *
                   np.random.randn(out_channel, input_channel, filter_size, filter_size))
         self.b = np.zeros(out_channel)
@@ -76,7 +76,7 @@ class Convolution:
 
         self.db, self.dW = np.sum(dout, axis=0), np.dot(self.col.T, dout)
         self.dW = self.dW.transpose(1, 0).reshape(FN, C, FH, FW)
-        self.grad += [self.dW, self.db]
+        self.grad = [self.dW, self.db]
 
         return dx
 
@@ -209,7 +209,7 @@ class BatchNormalization:
         dx = self.__backward(dout)
         dx = dx.reshape(*self.shape)
 
-        self.grad += [self.dgamma, self.dbeta]
+        self.grad = [self.dgamma, self.dbeta]
 
         return dx
     
