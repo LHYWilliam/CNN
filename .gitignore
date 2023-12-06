@@ -6,4 +6,6 @@ __pycache__
 runs
 source code
 
+*.pkl
+*.gz
 main.py
