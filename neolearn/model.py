@@ -79,7 +79,7 @@ class Model(BaseModel):
         self.layers, self.params, self.grads = [], [], []
 
         for layer_param in cfg:
-            self.layers.append(eval(layer_param['layer'])(*layer_param['param']))
+            self.layers.append(eval(layer_param[0])(*layer_param[1]))
         self.loss_layer = SoftmaxWithLoss()
 
         for layer in self.layers:

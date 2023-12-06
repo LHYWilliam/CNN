@@ -1,4 +1,4 @@
-import json
+import yaml
 import argparse
 from pathlib import Path
 
@@ -35,10 +35,10 @@ def print_args(args):
         print(f'{key}:{value}', end='  ', flush=True)
 
 
-def print_cfg(layers):
+def print_cfg(layer_param):
     print("\n\nnumber    layer               param")
-    for number, layer_param in enumerate(layers):
-        layer, param = layer_param.values()
+    for number, layer_param in enumerate(layer_param):
+        layer, param = layer_param
         print(f'{number:<10}{layer:20}{param}')
 
 
@@ -66,7 +66,7 @@ def main(opt):
         print_cfg(model.cfg)
     elif cfg:
         with open(Path(Path('./neolearn/models') / cfg)) as f:
-            cfg = json.load(f)
+            cfg = yaml.safe_load(f)
         model = neolearn.model.Model(cfg)
         optimizer = neolearn.optimizer.Adam(model=model, lr=lr)
         print_cfg(cfg)

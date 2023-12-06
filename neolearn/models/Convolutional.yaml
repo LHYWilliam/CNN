@@ -1,0 +1,35 @@
+[ 
+  [Convolution, [1, 16, 3, 1, 1]],
+  [BatchNormalization, [12544]], # 28*28*16
+  [ReLu, []],
+  [Convolution, [16, 16, 3, 1, 1]],
+  [BatchNormalization, [12544]], # 28*28*16
+  [ReLu, []],
+  [Convolution, [16, 16, 2, 2, 0]],
+
+  [Convolution, [16, 32, 3, 1, 1]],
+  [BatchNormalization, [6272]], # 14*14*32
+  [ReLu, []],
+  [Convolution, [32, 32, 3, 1, 2]],
+  [BatchNormalization, [8192]], # 16*16*32
+  [ReLu, []],
+  [Convolution, [32, 32, 2, 2, 0]],
+
+  [Convolution, [32, 64, 3, 1, 1]],
+  [BatchNormalization, [4096]], # 8*8*64
+  [ReLu, []],
+  [Convolution, [64, 64, 3, 1, 1]],
+  [BatchNormalization, [4096]], # 8*8*64
+  [ReLu, []],
+  [Convolution, [64, 64, 2, 2, 0]],
+
+  [Convolution, [64, 1024, 4, 4, 0]],
+
+  [Convolution, [1024, 64, 1, 1, 0]],
+  [BatchNormalization, [64]], # 1*1*64
+  [ReLu, []],
+
+  [Convolution, [64, 10, 1, 1, 0]],
+
+  [Flatten, []],
+]
