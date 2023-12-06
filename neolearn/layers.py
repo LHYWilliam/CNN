@@ -1,7 +1,7 @@
 import cupy as np
 
-from common.util import (xavier, he, im2col, col2im)  # DO NOT MOVE
-from common.functions import (sigmoid, softmax, cross_entropy_error)
+from neolearn.util import (xavier, he, im2col, col2im)  # DO NOT MOVE
+from neolearn.functions import (sigmoid, softmax, cross_entropy_error)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 

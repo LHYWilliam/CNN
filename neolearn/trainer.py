@@ -3,7 +3,7 @@ from collections import deque
 
 import cupy as np
 
-from common.util import (plots, progress_bar, save, to_cpu)
+from neolearn.util import (plots, progress_bar, save, to_cpu)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 

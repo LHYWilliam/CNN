@@ -1,6 +1,6 @@
 import cupy as np
 
-from common.layers import (Affine, Convolution, Pooling, Flatten, ReLu, BatchNormalization, Dropout, SoftmaxWithLoss)  # DO NOT MOVE
+from neolearn.layers import (Affine, Convolution, Pooling, Flatten, ReLu, BatchNormalization, Dropout, SoftmaxWithLoss)  # DO NOT MOVE
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
