@@ -10,9 +10,9 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Trainer:
-    def __init__(self, model, optimizer, train_loader, test_loader):
+    def __init__(self, model, loss, optimizer, train_loader, test_loader):
         self.train_iters, self.test_iters = None, None
-        self.model, self.optimizer = model, optimizer
+        self.model, self.loss, self.optimizer = model, loss, optimizer
         self.train_loader, self.test_loader = train_loader, test_loader
 
     def train(self, epochs=16, batch_size=128, nosave=False, noplot=False, project=None):
@@ -27,11 +27,11 @@ class Trainer:
 
                 y = self.model.forward(x_batch, train=True)
 
-                loss = self.model.loss(y, t_batch)
+                loss = self.loss(y, t_batch)
                 accuracy = np.sum(y.argmax(axis=1) == t_batch).item() / batch_size
                 caculate.train_add(loss, accuracy)
 
-                self.model.backward()
+                self.loss.backward()
                 self.optimizer.update()
                 self.optimizer.zero_grad()
 

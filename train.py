@@ -67,8 +67,8 @@ def main(opt):
         print_cfg(cfg)
     else:
         return
-
-    trainer = neolearn.Trainer(model, optimizer, train_loader, test_loader)
+    loss = neolearn.loss.SoftmaxWithLoss(model)
+    trainer = neolearn.Trainer(model, loss, optimizer, train_loader, test_loader)
     trainer.train(epochs=epochs, batch_size=batch_size, nosave=nosave, noplot=noplot, project=project)
 
 

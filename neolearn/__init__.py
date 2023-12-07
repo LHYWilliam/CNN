@@ -1,3 +1,4 @@
+import neolearn.loss
 import neolearn.util
 import neolearn.model
 import neolearn.layers

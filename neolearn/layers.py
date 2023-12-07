@@ -272,29 +272,3 @@ class Dropout:
         dx = dout * self.mask
 
         return dx
-
-
-class SoftmaxWithLoss:
-    def __init__(self):
-        self.acquire_grad = False
-
-        self.y, self.t = None, None
-
-    def forward(self, x, t, train=True):
-        self.y, self.t = softmax(x), t
-
-        loss = cross_entropy_error(self.y, self.t)
-
-        return loss
-
-    def backward(self, dout=1):
-        batch_size = self.t.shape[0]
-
-        if self.y.size == self.t.size:
-            dx = (self.y - self.t) / batch_size
-        else:
-            dx = self.y.copy()
-            dx[np.arange(batch_size), self.t] -= 1
-            dx = dx / batch_size
-
-        return dx

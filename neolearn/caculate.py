@@ -2,7 +2,7 @@ from numpy import average
 
 
 class Caculate:
-    def __init__(self, train_iters, test_iters) -> None:
+    def __init__(self, train_iters, test_iters):
         self.train_iters, self.test_iters = train_iters, test_iters
         self._loss, self.train_accuracy, self.test_accuracy = [], [], []
     
