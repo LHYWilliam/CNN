@@ -30,7 +30,6 @@ class BaseModel(abc.ABC):
         for layer in self.layers:
             if layer.acquire_grad:
                 self.grads += layer.grad
-                layer.zero_grad()
 
         return dx
 
@@ -66,3 +65,13 @@ class Model(BaseModel):
     def load(self, params):
         for self_param, param in zip(self.params, params):
             self_param[...] = param
+
+
+class Sequential(BaseModel):
+    def __init__(self, *args):
+        super().__init__()
+        self.layers, self.params, self.grads = args, [], []
+        
+        for layer in self.layers:
+            if layer.acquire_grad:
+                self.params += layer.param

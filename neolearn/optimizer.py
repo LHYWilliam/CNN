@@ -56,7 +56,7 @@ class AdaGrad:
 
 class Adam:
     def __init__(self, model, lr=0.01, beta1=0.9, beta2=0.999):
-        self.params, self.grads = model.params, model.grads
+        self.layers, self.params, self.grads = model.layers, model.params, model.grads
         self.lr, self.beta1, self.beta2 = lr, beta1, beta2
         self.iter, self.m, self.v = 0, None, None
 
@@ -79,3 +79,6 @@ class Adam:
 
     def zero_grad(self):
         self.grads.clear()
+        for layer in self.layers:
+            if layer.acquire_grad:
+                layer.zero_grad()
