@@ -20,10 +20,7 @@ def parse_opt():
     parser.add_argument('--weight-init', type=str, default='he')
     parser.add_argument('--nosave', action='store_true')
     parser.add_argument('--noplot', action='store_true')
-    parser.add_argument('--early-break', action='store_true')
     parser.add_argument('--project', type=str, default=None)
-    parser.add_argument('--train-show-per-iter', '--train-show', type=int, default=1)
-    parser.add_argument('--test-show-per-iter', '--test-show', type=int, default=1)
     parser.add_argument('--seed', type=int, default=0)
 
     return parser.parse_args()
@@ -43,10 +40,8 @@ def print_cfg(layer_param):
 
 
 def main(opt):
-    (cfg, weight, lr, epochs, batch_size, nosave, noplot, early_break, project,
-     train_show_per_iter, test_show_per_iter, seed) = (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
-                                                       opt.nosave, opt.noplot, opt.early_break, opt.project,
-                                                       opt.train_show_per_iter, opt.test_show_per_iter, opt.seed)
+    (cfg, weight, lr, epochs, batch_size, nosave, noplot, project, seed) = (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
+                                                       opt.nosave, opt.noplot, opt.project, opt.seed)
     project = neolearn.util.increment_path('runs/train', mkdir=not nosave) if (not project and not nosave) else Path(project)
 
     numpy.random.seed(seed)
@@ -74,8 +69,7 @@ def main(opt):
         return
 
     trainer = neolearn.Trainer(model, optimizer, train_loader, test_loader)
-    trainer.train(epochs=epochs, batch_size=batch_size, train_show=train_show_per_iter,
-                  test_show=test_show_per_iter, nosave=nosave, noplot=noplot, early_break=early_break, project=project)
+    trainer.train(epochs=epochs, batch_size=batch_size, nosave=nosave, noplot=noplot, project=project)
 
 
 if __name__ == '__main__':
