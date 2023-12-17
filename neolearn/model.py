@@ -21,7 +21,7 @@ class BaseModel(abc.ABC):
             out = layer.forward(out, train)
 
         return out
-    
+
     def backward(self, dout=1):
         dx = dout
         for layer in reversed(self.layers):
@@ -71,7 +71,7 @@ class Sequential(BaseModel):
     def __init__(self, *args):
         super().__init__()
         self.layers, self.params, self.grads = args, [], []
-        
+
         for layer in self.layers:
             if layer.acquire_grad:
                 self.params += layer.param

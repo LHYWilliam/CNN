@@ -40,9 +40,10 @@ def print_cfg(layer_param):
 
 
 def main(opt):
-    (cfg, weight, lr, epochs, batch_size, nosave, noplot, project, seed) = (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size,
-                                                       opt.nosave, opt.noplot, opt.project, opt.seed)
-    project = neolearn.util.increment_path('runs/train', mkdir=not nosave) if (not project and not nosave) else Path(project)
+    (cfg, weight, lr, epochs, batch_size, nosave, noplot, project, seed) = \
+        (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size, opt.nosave, opt.noplot, opt.project, opt.seed)
+    project = neolearn.util.increment_path('runs/train', mkdir=not nosave) \
+        if (not project and not nosave) else Path(project)
 
     numpy.random.seed(seed)
     np.random.seed(seed)
@@ -54,9 +55,10 @@ def main(opt):
 
     if weight:
         checkpoint = neolearn.util.load(weight)
-        model = neolearn.models.Model(checkpoint['cfg'])
+        model = neolearn.model.Model(checkpoint['cfg'])
         model.load(neolearn.util.to_gpu(*checkpoint['params']))
-        optimizer = neolearn.optimizer.Adam(model=model, lr=checkpoint['lr'], beta1=checkpoint['beta1'], beta2=checkpoint['beta2'])
+        optimizer = neolearn.optimizer.Adam(model=model, lr=checkpoint['lr'],
+                                            beta1=checkpoint['beta1'], beta2=checkpoint['beta2'])
         optimizer.load([neolearn.util.to_gpu(*checkpoint['m']), neolearn.util.to_gpu(*checkpoint['v'])])
         print_cfg(model.cfg)
     elif cfg:

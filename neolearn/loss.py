@@ -5,13 +5,14 @@ from neolearn.functions import (softmax, cross_entropy_error)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
+
 class SoftmaxWithLoss:
     def __init__(self, model):
         self.model = model
         self.acquire_grad = False
 
         self.y, self.t = None, None
-    
+
     def __call__(self, y, t, train=True):
         return self.forward(y, t, train=train)
 
@@ -27,7 +28,6 @@ class SoftmaxWithLoss:
         dx = self.model.backward(dx)
 
         return dx
-
 
     def _loss_backward(self, dout=1):
         batch_size = self.t.shape[0]

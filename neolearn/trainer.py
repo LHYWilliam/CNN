@@ -3,7 +3,7 @@ import time
 
 import cupy as np
 
-from neolearn.caculate import Caculate
+from neolearn.calculate import Calculate
 from neolearn.util import (plots, progress_bar, save, to_cpu)
 
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
@@ -17,33 +17,32 @@ class Trainer:
 
     def train(self, epochs=16, batch_size=128, nosave=False, noplot=False, project=None):
         self.train_iters, self.test_iters = len(self.train_loader), len(self.test_loader)
-        caculate = Caculate(self.train_iters, self.test_iters)
+        calculate = Calculate(self.train_iters, self.test_iters)
 
         for epoch in range(epochs):
             print('\n     epoch       mod           iter          loss     accuracy        time')
 
             start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(self.train_loader):
-
                 y = self.model.forward(x_batch, train=True)
 
                 loss = self.loss(y, t_batch)
                 accuracy = np.sum(y.argmax(axis=1) == t_batch).item() / batch_size
-                caculate.train_add(loss, accuracy)
+                calculate.train_add(loss, accuracy)
 
                 self.loss.backward()
                 self.optimizer.update()
                 self.optimizer.zero_grad()
 
-                self.__train_show(epoch, epochs, iter, caculate.average_loss, caculate.train_average_accuracy, start_time)
+                self.__train_show(epoch, epochs, iter,
+                                  calculate.average_loss, calculate.train_average_accuracy, start_time)
 
             start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(self.test_loader):
-
                 accuracy = self.model.accuracy(x_batch, t_batch)
-                caculate.test_add(accuracy)
+                calculate.test_add(accuracy)
 
-                self.__test_show(iter, caculate.test_average_accuracy, start_time)
+                self.__test_show(iter, calculate.test_average_accuracy, start_time)
 
             if not nosave:
                 checkpoint = {
@@ -59,13 +58,13 @@ class Trainer:
                     'v': to_cpu(*self.optimizer.v)
                 }
                 save(project / 'last.pkl', checkpoint)
-                if caculate.test_average_accuracy > caculate.test_best_accuracy:
+                if calculate.test_average_accuracy > calculate.test_best_accuracy:
                     save(project / 'best.pkl', checkpoint)
 
         if not noplot:
-            plots([caculate.loss], ['train loss'], 'iter', 'loss')
-            plots([caculate.train_epochs_accuracy, caculate.test_epochs_accuracy], ['train accuracy', 'test accuracy'],
-                  'iter', 'accuracy')
+            plots([calculate.loss], ['train loss'], 'iter', 'loss')
+            plots([calculate.train_epochs_accuracy, calculate.test_epochs_accuracy],
+                  ['train accuracy', 'test accuracy'], 'iter', 'accuracy')
 
     def __train_show(self, epoch, epochs, iter, loss, accuracy, start_time):
         epoch_bar = f'{epoch + 1}/{epochs}'

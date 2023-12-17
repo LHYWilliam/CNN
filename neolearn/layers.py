@@ -190,37 +190,37 @@ class BatchNormalization:
 
         self.grad, self.acquire_grad = [], True
         self.dgamma, self.dbeta = None, None
-    
+
     def forward(self, x, train=True):
         self.shape, self.batch_size = x.shape, x.shape[0]
 
         if x.ndim != 2:
             x = x.reshape(self.batch_size, -1)
-        
+
         out = self.__forward(x, train)
         out = out.reshape(*self.shape)
 
         return out
-    
+
     def backward(self, dout):
         if dout.ndim != 2:
             dout = dout.reshape(self.batch_size, -1)
-        
+
         dx = self.__backward(dout)
         dx = dx.reshape(*self.shape)
 
         self.grad = [self.dgamma, self.dbeta]
 
         return dx
-    
+
     def zero_grad(self):
         self.grad.clear()
-    
+
     def __forward(self, x, train):
         if self.running_mean is None:
             self.running_mean = np.zeros(x.shape[1])
             self.running_var = np.zeros(x.shape[1])
-        
+
         if train:
             mu = x.mean(axis=0)
             xc = x - mu
@@ -234,11 +234,11 @@ class BatchNormalization:
         else:
             xc = x - self.running_mean
             xn = xc / np.sqrt(self.running_var + 10e-7)
-        
+
         out = self.gamma * xn + self.beta
 
         return out
-    
+
     def __backward(self, dout):
         dbeta = dout.sum(axis=0)
         dgamma = np.sum(self.xn * dout, axis=0)
