@@ -1,4 +1,3 @@
-from calendar import c
 import time
 
 import cupy as np
@@ -27,22 +26,22 @@ class Trainer:
                 y = self.model.forward(x_batch, train=True)
 
                 loss = self.loss(y, t_batch)
-                accuracy = np.sum(y.argmax(axis=1) == t_batch).item() / batch_size
-                calculate.train_add(loss, accuracy)
+                accuracy = np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
+                calculate.train(loss, accuracy)
 
                 self.loss.backward()
                 self.optimizer.update()
                 self.optimizer.zero_grad()
 
-                self.__train_show(epoch, epochs, iter,
-                                  calculate.average_loss, calculate.train_average_accuracy, start_time)
+                self._train_show(epoch, epochs, iter,
+                                 calculate.average_loss, calculate.train_average_accuracy, start_time)
 
             start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(self.test_loader):
                 accuracy = self.model.accuracy(x_batch, t_batch)
-                calculate.test_add(accuracy)
+                calculate.test(accuracy)
 
-                self.__test_show(iter, calculate.test_average_accuracy, start_time)
+                self._test_show(iter, calculate.test_average_accuracy, start_time)
 
             if not nosave:
                 checkpoint = {
@@ -66,7 +65,7 @@ class Trainer:
             plots([calculate.train_epochs_accuracy, calculate.test_epochs_accuracy],
                   ['train accuracy', 'test accuracy'], 'iter', 'accuracy')
 
-    def __train_show(self, epoch, epochs, iter, loss, accuracy, start_time):
+    def _train_show(self, epoch, epochs, iter, loss, accuracy, start_time):
         epoch_bar = f'{epoch + 1}/{epochs}'
         iter_bar = f'{iter + 1}/{self.train_iters}'
 
@@ -79,10 +78,9 @@ class Trainer:
 
         progress_bar(iter, self.train_iters, message=message, break_line=(iter + 1 == self.train_iters))
 
-    def __test_show(self, iter, accuracy, start_time):
+    def _test_show(self, iter, accuracy, start_time):
         epoch_blank = ' ' * 10
         loss_blank = ' ' * 14
-
         iter_bar = f'{iter + 1:{len(str(self.test_iters))}}/{self.test_iters}'
 
         message = f'{epoch_blank}' \
