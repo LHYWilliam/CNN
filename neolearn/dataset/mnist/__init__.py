@@ -1,1 +1,0 @@
-from neolearn.dataset.mnist.mnist import load
