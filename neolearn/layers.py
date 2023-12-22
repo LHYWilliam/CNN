@@ -6,7 +6,7 @@ from neolearn.functions import (sigmoid, softmax, cross_entropy_error)
 np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
-class Affine:
+class Linear:
     def __init__(self, input_size, output_size, weight_init='he'):
         self.W = eval(weight_init)(input_size) * np.random.randn(input_size, output_size)
         self.b = eval(weight_init)(input_size) * np.random.randn(output_size)
