@@ -14,13 +14,13 @@ def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cfg', type=str, default=None)
     parser.add_argument('--weight', type=str, default=None)
+    parser.add_argument('--data', type=str, default=None)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--epochs', type=int, default=16)
     parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--weight-init', type=str, default='he')
     parser.add_argument('--nosave', action='store_true')
     parser.add_argument('--noplot', action='store_true')
-    parser.add_argument('--project', type=str, default=None)
+    parser.add_argument('--project', type=str, default='runs/train/exp')
     parser.add_argument('--seed', type=int, default=0)
 
     return parser.parse_args()
@@ -40,16 +40,20 @@ def print_cfg(layer_param):
 
 
 def main(opt):
-    (cfg, weight, lr, epochs, batch_size, nosave, noplot, project, seed) = \
-        (opt.cfg, opt.weight, opt.lr, opt.epochs, opt.batch_size, opt.nosave, opt.noplot, opt.project, opt.seed)
-    project = neolearn.util.increment_path('runs/train', mkdir=not nosave) \
-        if (not project and not nosave) else Path(project)
+    (cfg, weight, data, lr, epochs, batch_size, nosave, noplot, project, seed) \
+        = (opt.cfg, opt.weight, opt.data, opt.lr, opt.epochs, opt.batch_size,
+           opt.nosave, opt.noplot, opt.project, opt.seed)
+
+    if not (cfg or weight) and not data:
+        return
 
     numpy.random.seed(seed)
     np.random.seed(seed)
 
-    # classes, (x_train, t_train), (x_test, t_test) = neolearn.datasets.mnist.load(flatten=False)
-    classes, (x_train, t_train), (x_test, t_test) = neolearn.datasets.cifar10.load()
+    data = eval(f'neolearn.datasets.{data}')
+    project = neolearn.util.increment_path(project) if not nosave else project
+
+    classes, (x_train, t_train), (x_test, t_test) = data.load()
     x_train, t_train, x_test, t_test = neolearn.util.to_gpu(x_train, t_train, x_test, t_test)
     train_loader = neolearn.DataLoader(x_train, t_train, batch_size)
     test_loader = neolearn.DataLoader(x_test, t_test, batch_size)

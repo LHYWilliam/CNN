@@ -53,12 +53,13 @@ def increment_path(path, sep='', mkdir=True, exist_ok=True):
     path = Path(path)
     if path.exists():
         path, suffix = (path.with_suffix(''), path.suffix) if path.is_file() else (path, '')
+        back = path
 
         for n in range(2, 9999):
-            p = f'{path}{sep}{n}{suffix}'
-            if not os.path.exists(p):
+            path = Path(f'{back}{sep}{n}{suffix}')
+            if not path.exists():
                 break
-        path = Path(p)
+
     if mkdir:
         path.mkdir(parents=True, exist_ok=exist_ok)
 

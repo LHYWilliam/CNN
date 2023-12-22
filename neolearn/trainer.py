@@ -38,7 +38,9 @@ class Trainer:
 
             start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(self.test_loader):
-                accuracy = self.model.accuracy(x_batch, t_batch)
+                y = self.model.forward(x_batch, train=False)
+
+                accuracy = np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
                 calculate.test(accuracy)
 
                 self._test_show(iter, calculate.test_average_accuracy, start_time)
@@ -57,7 +59,8 @@ class Trainer:
                     'v': to_cpu(*self.optimizer.v)
                 }
                 save(project / 'last.pkl', checkpoint)
-                if calculate.test_average_accuracy > calculate.test_best_accuracy:
+                # TODO：fix best save bug
+                if calculate.test_last_accuracy >= calculate.test_best_accuracy:
                     save(project / 'best.pkl', checkpoint)
 
         if not noplot:

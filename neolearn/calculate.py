@@ -5,7 +5,6 @@ class Calculate:
     def __init__(self, train_iters, test_iters):
         self.train_iters, self.test_iters = train_iters, test_iters
         self._loss, self.train_accuracy, self.test_accuracy = [], [], []
-        self._test_best_accuracy = 0
 
     def train(self, loss, accuracy):
         self._loss.append(loss)
@@ -32,9 +31,11 @@ class Calculate:
 
     @property
     def test_best_accuracy(self):
-        back = self._test_best_accuracy
-        self._test_best_accuracy = max(self._test_best_accuracy, max(self.test_accuracy))
-        return back
+        return max(self.test_accuracy)
+
+    @property
+    def test_last_accuracy(self):
+        return self.test_accuracy[-1]
 
     @property
     def train_epochs_accuracy(self):
