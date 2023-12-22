@@ -1,4 +1,3 @@
-from typing import Any
 import cupy as np
 
 from neolearn.functions import (softmax, cross_entropy_error)

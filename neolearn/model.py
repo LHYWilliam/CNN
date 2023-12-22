@@ -8,7 +8,7 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 class BaseModel(abc.ABC):
     def __init__(self):
-        pass
+        self.layers, self.grads = None, None
 
     def __call__(self, x):
         y = self.forward(x)
@@ -30,6 +30,7 @@ class BaseModel(abc.ABC):
         for layer in self.layers:
             if layer.acquire_grad:
                 self.grads += layer.grad
+                layer.zero_grad()
 
         return dx
 
@@ -43,7 +44,7 @@ class BaseModel(abc.ABC):
         total_count = 1 if x.ndim == 1 else x.shape[0]
         y = self.predict(x)
 
-        accu_count = np.sum(y == t)
+        accu_count = np.sum(np.array(y == t))
         accuracy = accu_count / total_count
 
         return accuracy.item()

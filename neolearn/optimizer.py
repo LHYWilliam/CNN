@@ -79,6 +79,3 @@ class Adam:
 
     def zero_grad(self):
         self.grads.clear()
-        for layer in self.layers:
-            if layer.acquire_grad:
-                layer.zero_grad()

@@ -48,7 +48,8 @@ def main(opt):
     numpy.random.seed(seed)
     np.random.seed(seed)
 
-    (x_train, t_train), (x_test, t_test) = neolearn.dataset.mnist.load(flatten=False)
+    # classes, (x_train, t_train), (x_test, t_test) = neolearn.datasets.mnist.load(flatten=False)
+    classes, (x_train, t_train), (x_test, t_test) = neolearn.datasets.cifar10.load()
     x_train, t_train, x_test, t_test = neolearn.util.to_gpu(x_train, t_train, x_test, t_test)
     train_loader = neolearn.DataLoader(x_train, t_train, batch_size)
     test_loader = neolearn.DataLoader(x_test, t_test, batch_size)
