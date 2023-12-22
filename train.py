@@ -26,19 +26,6 @@ def parse_opt():
     return parser.parse_args()
 
 
-def print_args(args):
-    print('\narguments: ', end='')
-    for key, value in args.items():
-        print(f'{key}:{value}', end='  ', flush=True)
-
-
-def print_cfg(layer_param):
-    print("\n\nnumber    layer               param")
-    for number, layer_param in enumerate(layer_param):
-        layer, param = layer_param
-        print(f'{number:<10}{layer:20}{param}')
-
-
 def main(opt):
     (cfg, weight, data, lr, epochs, batch_size, nosave, noplot, project, seed) \
         = (opt.cfg, opt.weight, opt.data, opt.lr, opt.epochs, opt.batch_size,
@@ -56,7 +43,7 @@ def main(opt):
     classes, (x_train, t_train), (x_test, t_test) = data.load()
     x_train, t_train, x_test, t_test = neolearn.util.to_gpu(x_train, t_train, x_test, t_test)
     train_loader = neolearn.DataLoader(x_train, t_train, batch_size)
-    test_loader = neolearn.DataLoader(x_test, t_test, batch_size)
+    test_loader = neolearn.DataLoader(x_test, t_test, batch_size, shuffle=False)
 
     if weight:
         checkpoint = neolearn.util.load(weight)
@@ -65,13 +52,13 @@ def main(opt):
         optimizer = neolearn.optimizer.Adam(model=model, lr=checkpoint['lr'],
                                             beta1=checkpoint['beta1'], beta2=checkpoint['beta2'])
         optimizer.load([neolearn.util.to_gpu(*checkpoint['m']), neolearn.util.to_gpu(*checkpoint['v'])])
-        print_cfg(model.cfg)
+        neolearn.util.print_cfg(model.cfg)
     elif cfg:
-        with open(Path(Path('./neolearn/models') / cfg)) as f:
+        with open(Path('./neolearn/models') / cfg) as f:
             cfg = yaml.safe_load(f)
         model = neolearn.model.Model(cfg)
         optimizer = neolearn.optimizer.Adam(model=model, lr=lr)
-        print_cfg(cfg)
+        neolearn.util.print_cfg(cfg)
     else:
         return
     loss = neolearn.loss.SoftmaxWithLoss(model)
@@ -81,5 +68,5 @@ def main(opt):
 
 if __name__ == '__main__':
     opt = parse_opt()
-    print_args(vars(opt))
+    neolearn.util.print_args(vars(opt))
     main(opt)

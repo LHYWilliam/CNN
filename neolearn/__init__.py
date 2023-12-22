@@ -8,5 +8,6 @@ import neolearn.optimizer
 from neolearn.datasets.mnist.mnist import load
 from neolearn.datasets.cifar10.cifar10 import load
 
-from neolearn.dataloader import DataLoader
 from neolearn.trainer import Trainer
+from neolearn.detector import Detector
+from neolearn.dataloader import DataLoader

@@ -19,15 +19,15 @@ class Calculate:
 
     @property
     def average_loss(self):
-        return average(self._loss[-16:])
+        return average(self._loss[-self.train_iters // 10:])
 
     @property
     def train_average_accuracy(self):
-        return average(self.train_accuracy[-16:])
+        return average(self.train_accuracy[-self.train_iters // 10:])
 
     @property
     def test_average_accuracy(self):
-        return average(self.test_accuracy[-16:])
+        return average(self.test_accuracy[-self.test_iters:])
 
     @property
     def test_best_accuracy(self):

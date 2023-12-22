@@ -105,6 +105,19 @@ def col2im(col, input_shape, h, w, stride=1, pad=0):
     return img[:, :, pad:H + pad, pad:W + pad]
 
 
+def print_args(args):
+    print('\narguments: ', end='')
+    for key, value in args.items():
+        print(f'{key}:{value}', end='  ', flush=True)
+
+
+def print_cfg(layer_param):
+    print("\n\nnumber    layer               param")
+    for number, layer_param in enumerate(layer_param):
+        layer, param = layer_param
+        print(f'{number:<10}{layer:20}{param}')
+
+
 def to_gpu(*args):
     out = []
 
