@@ -15,18 +15,17 @@ class Detector:
     def detect(self, batch_size=1, nosave=False, project=None):
         print('\n       mod           iter     accuracy        time')
 
-        accuracy = 0.
-        start_time = time.time()
+        accuracy, start_time = 0., time.time()
         for iter, (x_batch, t_batch) in enumerate(self.test_loader):
             y = self.model.forward(x_batch, train=False)
 
-            accuracy = np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
+            # print(f'{y.argmax(axis=1)} -> {t_batch}')
 
-            self._test_show(iter, accuracy, start_time)
+            accuracy += np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
+
+            self._test_show(iter, accuracy / (iter + 1), start_time)
 
         # TODO: save
-        if not nosave:
-            pass
 
     def _test_show(self, iter, accuracy, start_time):
         iter_bar = f'{iter + 1:{len(str(self.test_iters))}}/{self.test_iters}'

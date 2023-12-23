@@ -8,7 +8,7 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 class BaseModel(abc.ABC):
     def __init__(self):
-        self.layers, self.grads = [], []
+        self.layers, self.params, self.grads = [], [], []
 
     def __call__(self, x, train=True):
         y = self.forward(x, train)
@@ -39,24 +39,23 @@ class Model(BaseModel):
     def __init__(self, cfg):
         super().__init__()
         self.cfg = cfg
-        self.layers, self.params, self.grads = [], [], []
 
-        for layer_param in cfg:
-            self.layers.append(eval(layer_param[0])(*layer_param[1]))
+        self.layers = [eval(layer_param[0])(*layer_param[1]) for layer_param in cfg]
+        self.params, self.grads = [], []
 
         for layer in self.layers:
             if layer.acquire_grad:
                 self.params += layer.param
 
     def load(self, params):
-        for self_param, param in zip(self.params, params):
-            self_param[...] = param
+        for i, param in zip(range(len(self.params)), params):
+            self.params[i][...] = param
 
 
 class Sequential(BaseModel):
-    def __init__(self, *args):
+    def __init__(self, *layers):
         super().__init__()
-        self.layers, self.params, self.grads = args, [], []
+        self.layers, self.params, self.grads = layers, [], []
 
         for layer in self.layers:
             if layer.acquire_grad:

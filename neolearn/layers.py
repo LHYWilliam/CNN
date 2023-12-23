@@ -18,7 +18,8 @@ class Linear:
         self.x = None
 
     def forward(self, x, train=True):
-        self.x = x
+        if train:
+            self.x = x
 
         out = np.dot(x, self.W) + self.b
 
@@ -60,10 +61,11 @@ class Convolution:
         col = im2col(x, FH, FW, self.stride, self.pad)
         col_W = self.W.reshape(FN, -1).T
 
+        if train:
+            self.x, self.col, self.col_W = x, col, col_W
+
         out = np.dot(col, col_W) + self.b
         out = out.reshape(N, out_h, out_w, -1).transpose(0, 3, 1, 2)
-
-        self.x, self.col, self.col_W = x, col, col_W
 
         return out
 
@@ -101,10 +103,11 @@ class Pooling:
         col = col.reshape(-1, self.h * self.w)
         arg_max = np.argmax(col, axis=1)
 
+        if train:
+            self.x, self.arg_max = x, arg_max
+
         out = np.max(col, axis=1)
         out = out.reshape(N, out_h, out_w, C).transpose(0, 3, 1, 2)
-
-        self.x, self.arg_max = x, arg_max
 
         return out
 
@@ -128,7 +131,9 @@ class Flatten:
         self.x, self.shape = None, None
 
     def forward(self, x, train=True):
-        self.shape = x.shape
+        if train:
+            self.shape = x.shape
+
         out = x.reshape(x.shape[0], -1)
 
         return out
@@ -167,7 +172,8 @@ class Sigmoid:
     def forward(self, x, train=True):
         out = sigmoid(x)
 
-        self.out = out
+        if train:
+            self.out = out
 
         return out
 

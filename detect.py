@@ -11,6 +11,7 @@ def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weight', type=str, default=None)
     parser.add_argument('--data', type=str, default=None)
+    parser.add_argument('--batch-size', type=int, default=1)
     parser.add_argument('--nosave', action='store_true')
     parser.add_argument('--project', type=str, default='runs/detect/exp')
 
@@ -18,7 +19,7 @@ def parse_opt():
 
 
 def main(opt):
-    weight, data, nosave, project = opt.weight, opt.data, opt.nosave, opt.project
+    weight, data, batch_size, nosave, project = opt.weight, opt.data, opt.batch_size, opt.nosave, opt.project
 
     if not (weight and data):
         return
@@ -28,7 +29,7 @@ def main(opt):
 
     classes, (_, _), (x_test, t_test) = data.load()
     x_test, t_test = neolearn.util.to_gpu(x_test, t_test)
-    test_loader = neolearn.DataLoader(x_test, t_test, 1, shuffle=False)
+    test_loader = neolearn.DataLoader(x_test, t_test, batch_size, shuffle=False)
 
     checkpoint = neolearn.util.load(weight)
     model = neolearn.model.Model(checkpoint['cfg'])
@@ -37,7 +38,7 @@ def main(opt):
     neolearn.util.print_cfg(model.cfg)
 
     detector = neolearn.Detector(model, test_loader)
-    detector.detect(nosave=nosave, project=project)
+    detector.detect(batch_size=batch_size, nosave=nosave, project=project)
 
 
 if __name__ == '__main__':

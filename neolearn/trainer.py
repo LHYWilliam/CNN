@@ -10,12 +10,11 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 class Trainer:
     def __init__(self, model, loss, optimizer, train_loader, test_loader):
-        self.train_iters, self.test_iters = None, None
         self.model, self.loss, self.optimizer = model, loss, optimizer
         self.train_loader, self.test_loader = train_loader, test_loader
+        self.train_iters, self.test_iters = len(self.train_loader), len(self.test_loader)
 
     def train(self, epochs=16, batch_size=128, nosave=False, noplot=False, project=None):
-        self.train_iters, self.test_iters = len(self.train_loader), len(self.test_loader)
         calculate = Calculate(self.train_iters, self.test_iters)
 
         for epoch in range(epochs):
