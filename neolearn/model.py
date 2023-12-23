@@ -8,10 +8,10 @@ np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 class BaseModel(abc.ABC):
     def __init__(self):
-        self.layers, self.grads = None, None
+        self.layers, self.grads = [], []
 
-    def __call__(self, x):
-        y = self.forward(x)
+    def __call__(self, x, train=True):
+        y = self.forward(x, train)
 
         return y
 

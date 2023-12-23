@@ -119,18 +119,8 @@ def print_cfg(layer_param):
 
 
 def to_gpu(*args):
-    out = []
-
-    for x in args:
-        out.append(x if type(x) is cupy.ndarray else cupy.asarray(x))
-
-    return out
+    return [one if type(one) is cupy.ndarray else cupy.asarray(one) for one in args]
 
 
 def to_cpu(*args):
-    out = []
-
-    for x in args:
-        out.append(x if type(x) is numpy.ndarray else cupy.asnumpy(x))
-
-    return out
+    return [one if type(one) is numpy.ndarray else cupy.asnumpy(one) for one in args]

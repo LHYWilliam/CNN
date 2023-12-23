@@ -20,7 +20,7 @@ class Detector:
         for iter, (x_batch, t_batch) in enumerate(self.test_loader):
             y = self.model.forward(x_batch, train=False)
 
-            accuracy += np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
+            accuracy = np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
 
             self._test_show(iter, accuracy, start_time)
 

@@ -36,7 +36,7 @@ def main(opt):
 
     neolearn.util.print_cfg(model.cfg)
 
-    detector = neolearn.detector.Detector(model, test_loader)
+    detector = neolearn.Detector(model, test_loader)
     detector.detect(nosave=nosave, project=project)
 
 
