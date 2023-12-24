@@ -38,8 +38,6 @@ def main(opt):
     project = neolearn.util.increment_path(project) if not nosave else project
 
     classes, (x_train, t_train), (x_test, t_test) = data.load()
-    if neolearn.Config.GPU:
-        x_train, t_train, x_test, t_test = neolearn.util.to_gpu(x_train, t_train, x_test, t_test)
     train_loader = neolearn.DataLoader(x_train, t_train, batch_size)
     test_loader = neolearn.DataLoader(x_test, t_test, batch_size, shuffle=False)
 

@@ -30,12 +30,13 @@ def main(opt):
     project = neolearn.util.increment_path(project) if not nosave else project
 
     classes, (_, _), (x_test, t_test) = data.load()
-    x_test, t_test = neolearn.util.to_gpu(x_test, t_test)
     test_loader = neolearn.DataLoader(x_test, t_test, batch_size, shuffle=False)
 
     checkpoint = neolearn.util.load(weight)
     model = neolearn.model.Model(checkpoint['cfg'])
-    model.load(neolearn.util.to_gpu(*checkpoint['params']))
+    if neolearn.Config.GPU:
+        checkpoint['params'] = neolearn.util.to_gpu(*checkpoint['params'])
+    model.load(checkpoint['params'])
 
     neolearn.util.print_cfg(model.cfg)
 

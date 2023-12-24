@@ -1,2 +1,2 @@
 class Config:
-    GPU = False
+    GPU = True

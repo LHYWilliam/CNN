@@ -1,8 +1,9 @@
 import time
 
 from neolearn.np import *
+from neolearn.config import Config
 from neolearn.calculate import Calculate
-from neolearn.util import (plots, progress_bar, save, to_cpu)
+from neolearn.util import (plots, progress_bar, save, to_gpu, to_cpu)
 
 
 class Trainer:
@@ -19,6 +20,9 @@ class Trainer:
 
             start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(self.train_loader):
+                if Config.GPU:
+                    x_batch, t_batch = to_gpu(x_batch, t_batch)
+
                 y = self.model.forward(x_batch, train=True)
 
                 loss = self.loss(y, t_batch)
@@ -34,6 +38,9 @@ class Trainer:
 
             start_time = time.time()
             for iter, (x_batch, t_batch) in enumerate(self.test_loader):
+                if Config.GPU:
+                    x_batch, t_batch = to_gpu(x_batch, t_batch)
+
                 y = self.model.forward(x_batch, train=False)
 
                 accuracy = np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size

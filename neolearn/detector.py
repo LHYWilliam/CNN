@@ -1,7 +1,8 @@
 import time
 
 from neolearn.np import *
-from neolearn.util import (progress_bar)
+from neolearn.config import Config
+from neolearn.util import (progress_bar, to_gpu)
 
 
 class Detector:
@@ -14,6 +15,8 @@ class Detector:
 
         accuracy, start_time = 0., time.time()
         for iter, (x_batch, t_batch) in enumerate(self.test_loader):
+            if Config.GPU:
+                x_batch, t_batch = to_gpu(x_batch, t_batch)
             y = self.model.forward(x_batch, train=False)
 
             # print(f'{y.argmax(axis=1)} -> {t_batch}')
