@@ -1,7 +1,4 @@
 import numpy
-import cupy as np
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class DataLoader:
@@ -38,5 +35,5 @@ class DataLoader:
             raise StopIteration
 
     def shuffle(self):
-        index = numpy.random.permutation(numpy.arange(self.total_size))
+        index = numpy.random.permutation(list(range(self.total_size)))
         self.x, self.t = self.x[index], self.t[index]

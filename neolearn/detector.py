@@ -1,10 +1,7 @@
 import time
 
-import cupy as np
-
+from neolearn.np import *
 from neolearn.util import (progress_bar)
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Detector:

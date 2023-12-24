@@ -1,8 +1,5 @@
-import cupy as np
-
+from neolearn.np import *
 from neolearn.functions import (softmax, cross_entropy_error)
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class SoftmaxWithLoss:

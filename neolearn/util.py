@@ -1,14 +1,11 @@
-import os
 import pickle
-import argparse
 from pathlib import Path
 
 import numpy
 import cupy
-import cupy as np
-from matplotlib import pyplot as plt
 
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
+from neolearn.np import *
+from matplotlib import pyplot as plt
 
 
 def xavier(n):
@@ -20,7 +17,7 @@ def he(n):
 
 
 def plots(lists, labels, xlabel, ylabel):
-    x = numpy.arange(1, len(lists[0]) + 1)
+    x = list(range(1, len(lists[0]) + 1))
     for y, label in zip(lists, labels):
         plt.plot(x, y, label=label)
 

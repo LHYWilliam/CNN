@@ -1,11 +1,8 @@
 import time
 
-import cupy as np
-
+from neolearn.np import *
 from neolearn.calculate import Calculate
 from neolearn.util import (plots, progress_bar, save, to_cpu)
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class Trainer:

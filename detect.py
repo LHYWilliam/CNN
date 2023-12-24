@@ -1,10 +1,9 @@
 import argparse
 
-import cupy as np
+import numpy
 
 import neolearn
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
+from neolearn.np import *
 
 
 def parse_opt():
@@ -23,6 +22,9 @@ def main(opt):
 
     if not (weight and data):
         return
+
+    numpy.random.seed(0)
+    np.random.seed(0)
 
     data = eval(f'neolearn.datasets.{data}')
     project = neolearn.util.increment_path(project) if not nosave else project

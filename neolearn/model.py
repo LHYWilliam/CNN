@@ -1,9 +1,6 @@
 import abc
-import cupy as np
 
 from neolearn.layers import (Linear, Convolution, Pooling, Flatten, ReLu, BatchNormalization, Dropout)  # DO NOT MOVE
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
 
 
 class BaseModel(abc.ABC):

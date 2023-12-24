@@ -3,11 +3,8 @@ import argparse
 from pathlib import Path
 
 import numpy
-import cupy as np
-
 import neolearn
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
+from neolearn.np import *
 
 
 def parse_opt():
@@ -41,17 +38,22 @@ def main(opt):
     project = neolearn.util.increment_path(project) if not nosave else project
 
     classes, (x_train, t_train), (x_test, t_test) = data.load()
-    x_train, t_train, x_test, t_test = neolearn.util.to_gpu(x_train, t_train, x_test, t_test)
+    if neolearn.Config.GPU:
+        x_train, t_train, x_test, t_test = neolearn.util.to_gpu(x_train, t_train, x_test, t_test)
     train_loader = neolearn.DataLoader(x_train, t_train, batch_size)
     test_loader = neolearn.DataLoader(x_test, t_test, batch_size, shuffle=False)
 
     if weight:
         checkpoint = neolearn.util.load(weight)
+        if neolearn.Config.GPU:
+            checkpoint['params'] = neolearn.util.to_gpu(*checkpoint['params'])
+            checkpoint['m'] = neolearn.util.to_gpu(*checkpoint['m'])
+            checkpoint['v'] = neolearn.util.to_gpu(*checkpoint['v'])
         model = neolearn.model.Model(checkpoint['cfg'])
-        model.load(neolearn.util.to_gpu(*checkpoint['params']))
+        model.load(checkpoint['params'])
         optimizer = neolearn.optimizer.Adam(model=model, lr=checkpoint['lr'],
                                             beta1=checkpoint['beta1'], beta2=checkpoint['beta2'])
-        optimizer.load([neolearn.util.to_gpu(*checkpoint['m']), neolearn.util.to_gpu(*checkpoint['v'])])
+        optimizer.load([checkpoint['m'], checkpoint['v']])
         neolearn.util.print_cfg(model.cfg)
     elif cfg:
         with open(Path('./neolearn/models') / cfg) as f:
