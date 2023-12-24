@@ -17,11 +17,12 @@ class Detector:
         for iter, (x_batch, t_batch) in enumerate(self.test_loader):
             if Config.GPU:
                 x_batch, t_batch = to_gpu(x_batch, t_batch)
+
             y = self.model.forward(x_batch, train=False)
 
             # print(f'{y.argmax(axis=1)} -> {t_batch}')
 
-            accuracy += np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
+            accuracy += np.sum(y.argmax(axis=1) == t_batch).item() / batch_size
 
             self._test_show(iter, accuracy / (iter + 1), start_time)
 

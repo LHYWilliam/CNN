@@ -1,10 +1,11 @@
-import yaml
 import argparse
 from pathlib import Path
 
+import yaml
+import cupy
 import numpy
+
 import neolearn
-from neolearn.np import *
 
 
 def parse_opt():
@@ -32,7 +33,8 @@ def main(opt):
         return
 
     numpy.random.seed(seed)
-    np.random.seed(seed)
+    if neolearn.Config.GPU:
+        cupy.random.seed(seed)
 
     data = eval(f'neolearn.datasets.{data}')
     project = neolearn.util.increment_path(project) if not nosave else project

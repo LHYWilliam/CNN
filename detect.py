@@ -1,9 +1,9 @@
 import argparse
 
+import cupy
 import numpy
 
 import neolearn
-from neolearn.np import *
 
 
 def parse_opt():
@@ -24,7 +24,8 @@ def main(opt):
         return
 
     numpy.random.seed(0)
-    np.random.seed(0)
+    if neolearn.Config.GPU:
+        cupy.random.seed(0)
 
     data = eval(f'neolearn.datasets.{data}')
     project = neolearn.util.increment_path(project) if not nosave else project

@@ -1,6 +1,6 @@
 from neolearn.np import *
 from neolearn.util import (xavier, he, im2col, col2im)  # DO NOT MOVE
-from neolearn.functions import (sigmoid, softmax, cross_entropy_error)
+from neolearn.functions import (sigmoid)
 
 
 class Linear:
@@ -98,10 +98,9 @@ class Pooling:
 
         col = im2col(x, self.h, self.w, self.stride, self.pad)
         col = col.reshape(-1, self.h * self.w)
-        arg_max = np.argmax(col, axis=1)
 
         if train:
-            self.x, self.arg_max = x, arg_max
+            self.x, self.arg_max = x, np.argmax(col, axis=1)
 
         out = np.max(col, axis=1)
         out = out.reshape(N, out_h, out_w, C).transpose(0, 3, 1, 2)
@@ -147,10 +146,11 @@ class ReLu:
         self.acquire_grad = False
 
     def forward(self, x, train=True):
-        self.mask = x <= 0
+        if train:
+            self.mask = x <= 0
 
         out = x.copy()
-        out[self.mask] = 0
+        out[x <= 0] = 0
 
         return out
 

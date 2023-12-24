@@ -26,7 +26,7 @@ class Trainer:
                 y = self.model.forward(x_batch, train=True)
 
                 loss = self.loss(y, t_batch)
-                accuracy = np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
+                accuracy = np.sum(y.argmax(axis=1) == t_batch).item() / batch_size
                 calculate.train(loss, accuracy)
 
                 self.loss.backward()
@@ -43,7 +43,7 @@ class Trainer:
 
                 y = self.model.forward(x_batch, train=False)
 
-                accuracy = np.sum(np.array(y.argmax(axis=1) == t_batch)).item() / batch_size
+                accuracy = np.sum(y.argmax(axis=1) == t_batch).item() / batch_size
                 calculate.test(accuracy)
 
                 self._test_show(iter, calculate.test_average_accuracy, start_time)
@@ -62,7 +62,6 @@ class Trainer:
                     'v': to_cpu(*self.optimizer.v)
                 }
                 save(project / 'last.pkl', checkpoint)
-                # TODO：fix best save bug
                 if calculate.test_last_accuracy >= calculate.test_best_accuracy:
                     save(project / 'best.pkl', checkpoint)
 

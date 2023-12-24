@@ -12,3 +12,5 @@ from neolearn.config import Config
 from neolearn.trainer import Trainer
 from neolearn.detector import Detector
 from neolearn.dataloader import DataLoader
+
+from neolearn.np import *
