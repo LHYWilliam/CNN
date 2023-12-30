@@ -8,4 +8,7 @@ runs
 *.pkl
 source code
 
+*.pkl
+*.gz
+*batch*
 main.py

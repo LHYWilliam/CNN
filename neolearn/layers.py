@@ -1,12 +1,9 @@
-import cupy as np
-
-from common.util import (xavier, he, im2col, col2im)  # DO NOT MOVE
-from common.functions import (sigmoid, softmax, cross_entropy_error)
-
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
+from neolearn.np import *
+from neolearn.util import (xavier, he, im2col, col2im)  # DO NOT MOVE
+from neolearn.functions import (sigmoid)
 
 
-class Affine:
+class Linear:
     def __init__(self, input_size, output_size, weight_init='he'):
         self.W = eval(weight_init)(input_size) * np.random.randn(input_size, output_size)
         self.b = eval(weight_init)(input_size) * np.random.randn(output_size)
@@ -18,7 +15,8 @@ class Affine:
         self.x = None
 
     def forward(self, x, train=True):
-        self.x = x
+        if train:
+            self.x = x
 
         out = np.dot(x, self.W) + self.b
 
@@ -60,10 +58,11 @@ class Convolution:
         col = im2col(x, FH, FW, self.stride, self.pad)
         col_W = self.W.reshape(FN, -1).T
 
+        if train:
+            self.x, self.col, self.col_W = x, col, col_W
+
         out = np.dot(col, col_W) + self.b
         out = out.reshape(N, out_h, out_w, -1).transpose(0, 3, 1, 2)
-
-        self.x, self.col, self.col_W = x, col, col_W
 
         return out
 
@@ -99,12 +98,12 @@ class Pooling:
 
         col = im2col(x, self.h, self.w, self.stride, self.pad)
         col = col.reshape(-1, self.h * self.w)
-        arg_max = np.argmax(col, axis=1)
+
+        if train:
+            self.x, self.arg_max = x, np.argmax(col, axis=1)
 
         out = np.max(col, axis=1)
         out = out.reshape(N, out_h, out_w, C).transpose(0, 3, 1, 2)
-
-        self.x, self.arg_max = x, arg_max
 
         return out
 
@@ -128,7 +127,9 @@ class Flatten:
         self.x, self.shape = None, None
 
     def forward(self, x, train=True):
-        self.shape = x.shape
+        if train:
+            self.shape = x.shape
+
         out = x.reshape(x.shape[0], -1)
 
         return out
@@ -145,10 +146,11 @@ class ReLu:
         self.acquire_grad = False
 
     def forward(self, x, train=True):
-        self.mask = x <= 0
+        if train:
+            self.mask = x <= 0
 
         out = x.copy()
-        out[self.mask] = 0
+        out[x <= 0] = 0
 
         return out
 
@@ -167,7 +169,8 @@ class Sigmoid:
     def forward(self, x, train=True):
         out = sigmoid(x)
 
-        self.out = out
+        if train:
+            self.out = out
 
         return out
 
@@ -190,37 +193,37 @@ class BatchNormalization:
 
         self.grad, self.acquire_grad = [], True
         self.dgamma, self.dbeta = None, None
-    
+
     def forward(self, x, train=True):
         self.shape, self.batch_size = x.shape, x.shape[0]
 
         if x.ndim != 2:
             x = x.reshape(self.batch_size, -1)
-        
+
         out = self.__forward(x, train)
         out = out.reshape(*self.shape)
 
         return out
-    
+
     def backward(self, dout):
         if dout.ndim != 2:
             dout = dout.reshape(self.batch_size, -1)
-        
+
         dx = self.__backward(dout)
         dx = dx.reshape(*self.shape)
 
         self.grad = [self.dgamma, self.dbeta]
 
         return dx
-    
+
     def zero_grad(self):
         self.grad.clear()
-    
+
     def __forward(self, x, train):
         if self.running_mean is None:
             self.running_mean = np.zeros(x.shape[1])
             self.running_var = np.zeros(x.shape[1])
-        
+
         if train:
             mu = x.mean(axis=0)
             xc = x - mu
@@ -234,11 +237,11 @@ class BatchNormalization:
         else:
             xc = x - self.running_mean
             xn = xc / np.sqrt(self.running_var + 10e-7)
-        
+
         out = self.gamma * xn + self.beta
 
         return out
-    
+
     def __backward(self, dout):
         dbeta = dout.sum(axis=0)
         dgamma = np.sum(self.xn * dout, axis=0)
@@ -270,31 +273,5 @@ class Dropout:
 
     def backward(self, dout):
         dx = dout * self.mask
-
-        return dx
-
-
-class SoftmaxWithLoss:
-    def __init__(self):
-        self.acquire_grad = False
-
-        self.y, self.t = None, None
-
-    def forward(self, x, t, train=True):
-        self.y, self.t = softmax(x), t
-
-        loss = cross_entropy_error(self.y, self.t)
-
-        return loss
-
-    def backward(self, dout=1):
-        batch_size = self.t.shape[0]
-
-        if self.y.size == self.t.size:
-            dx = (self.y - self.t) / batch_size
-        else:
-            dx = self.y.copy()
-            dx[np.arange(batch_size), self.t] -= 1
-            dx = dx / batch_size
 
         return dx

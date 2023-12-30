@@ -1,14 +1,11 @@
-import os
 import pickle
-import argparse
 from pathlib import Path
 
 import numpy
 import cupy
-import cupy as np
-from matplotlib import pyplot as plt
 
-np.cuda.set_allocator(np.cuda.MemoryPool().malloc)
+from neolearn.np import *
+from matplotlib import pyplot as plt
 
 
 def xavier(n):
@@ -20,7 +17,7 @@ def he(n):
 
 
 def plots(lists, labels, xlabel, ylabel):
-    x = numpy.arange(1, len(lists[0]) + 1)
+    x = list(range(1, len(lists[0]) + 1))
     for y, label in zip(lists, labels):
         plt.plot(x, y, label=label)
 
@@ -35,38 +32,6 @@ def progress_bar(now, total, message='', break_line=False, bar=True):
         count = int(((now + 1) / total) * 10)
         message += '     [' + '-' * count + ' ' * (10 - count) + ']' + f' {count}/10'
     print(f'\r{message}', end='\n' if break_line else '')
-
-
-def parse_opt():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', type=str, default=None)
-    parser.add_argument('--weight', type=str, default=None)
-    parser.add_argument('--lr', type=float, default=0.001)
-    parser.add_argument('--epochs', type=int, default=16)
-    parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--weight-init', type=str, default='he')
-    parser.add_argument('--nosave', action='store_true')
-    parser.add_argument('--noplot', action='store_true')
-    parser.add_argument('--early-break', action='store_true')
-    parser.add_argument('--project', type=str, default=None)
-    parser.add_argument('--train-show-per-iter', '--train-show', type=int, default=1)
-    parser.add_argument('--test-show-per-iter', '--test-show', type=int, default=1)
-    parser.add_argument('--seed', type=int, default=0)
-
-    return parser.parse_args()
-
-
-def print_args(args):
-    print('\narguments: ', end='')
-    for key, value in args.items():
-        print(f'{key}:{value}', end='  ', flush=True)
-
-
-def print_cfg(layers):
-    print("\n\nnumber    layer               param")
-    for number, layer_param in enumerate(layers):
-        layer, param = layer_param.values()
-        print(f'{number:<10}{layer:20}{param}')
 
 
 def save(file, checkpoint):
@@ -85,12 +50,13 @@ def increment_path(path, sep='', mkdir=True, exist_ok=True):
     path = Path(path)
     if path.exists():
         path, suffix = (path.with_suffix(''), path.suffix) if path.is_file() else (path, '')
+        back = path
 
         for n in range(2, 9999):
-            p = f'{path}{sep}{n}{suffix}'
-            if not os.path.exists(p):
+            path = Path(f'{back}{sep}{n}{suffix}')
+            if not path.exists():
                 break
-        path = Path(p)
+
     if mkdir:
         path.mkdir(parents=True, exist_ok=exist_ok)
 
@@ -136,19 +102,22 @@ def col2im(col, input_shape, h, w, stride=1, pad=0):
     return img[:, :, pad:H + pad, pad:W + pad]
 
 
+def print_args(args):
+    print('\narguments: ', end='')
+    for key, value in args.items():
+        print(f'{key}:{value}', end='  ', flush=True)
+
+
+def print_cfg(layer_param):
+    print("\n\nnumber    layer               param")
+    for number, layer_param in enumerate(layer_param):
+        layer, param = layer_param
+        print(f'{number:<10}{layer:20}{param}')
+
+
 def to_gpu(*args):
-    out = []
-
-    for x in args:
-        out.append(x if type(x) is cupy.ndarray else cupy.asarray(x))
-
-    return out
+    return [one if type(one) is cupy.ndarray else cupy.asarray(one) for one in args]
 
 
 def to_cpu(*args):
-    out = []
-
-    for x in args:
-        out.append(x if type(x) is numpy.ndarray else cupy.asnumpy(x))
-
-    return out
+    return [one if type(one) is numpy.ndarray else cupy.asnumpy(one) for one in args]
