@@ -30,7 +30,7 @@ def main(opt):
     data = eval(f'neolearn.datasets.{data}')
     project = neolearn.util.increment_path(project) if not nosave else project
 
-    classes, (_, _), (x_test, t_test) = data.load()
+    _, (_, _), (x_test, t_test) = data.load()
     test_loader = neolearn.DataLoader(x_test, t_test, batch_size, shuffle=False)
 
     checkpoint = neolearn.util.load(weight)

@@ -9,6 +9,7 @@ import loss
 import util
 import model
 import layers
+import datasets
 import functions
 import optimizer
 
