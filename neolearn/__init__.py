@@ -1,16 +1,23 @@
-import neolearn.loss
-import neolearn.util
-import neolearn.model
-import neolearn.layers
-import neolearn.functions
-import neolearn.optimizer
+import os
+import sys
+import pathlib
 
-from neolearn.datasets.mnist.mnist import load
-from neolearn.datasets.cifar10.cifar10 import load
+root = pathlib.Path(os.path.abspath(__file__)).parent
+sys.path.append(str(root))
 
-from neolearn.config import Config
-from neolearn.trainer import Trainer
-from neolearn.detector import Detector
-from neolearn.dataloader import DataLoader
+import loss
+import util
+import model
+import layers
+import functions
+import optimizer
 
-from neolearn.np import *
+from datasets.mnist.mnist import load
+from datasets.cifar10.cifar10 import load
+
+from config import Config
+from trainer import Trainer
+from detector import Detector
+from dataloader import DataLoader
+
+from np import *

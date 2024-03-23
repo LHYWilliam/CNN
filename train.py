@@ -39,7 +39,7 @@ def main(opt):
     data = eval(f'neolearn.datasets.{data}')
     project = neolearn.util.increment_path(project) if not nosave else project
 
-    classes, (x_train, t_train), (x_test, t_test) = data.load()
+    _, (x_train, t_train), (x_test, t_test) = data.load()
     train_loader = neolearn.DataLoader(x_train, t_train, batch_size)
     test_loader = neolearn.DataLoader(x_test, t_test, batch_size, shuffle=False)
 
