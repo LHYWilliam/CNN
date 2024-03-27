@@ -10,11 +10,8 @@ import util
 import model
 import layers
 import datasets
-import functions
 import optimizer
-
-from datasets.mnist.mnist import load
-from datasets.cifar10.cifar10 import load
+import functions
 
 from config import Config
 from trainer import Trainer

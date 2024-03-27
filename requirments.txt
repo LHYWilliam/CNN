@@ -1,5 +1,5 @@
 contourpy==1.2.0
-cupy-cuda11x==13.0.0
+cupy-cuda12x==13.0.0
 cycler==0.12.1
 fastrlock==0.8.2
 fonttools==4.50.0

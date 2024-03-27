@@ -1,11 +1,13 @@
 from neolearn.np import *
-from neolearn.util import (xavier, he, im2col, col2im)  # DO NOT MOVE
-from neolearn.functions import (sigmoid)
+from neolearn.util import xavier, he, im2col, col2im  # DO NOT MOVE
+from neolearn.functions import sigmoid
 
 
 class Linear:
-    def __init__(self, input_size, output_size, weight_init='he'):
-        self.W = eval(weight_init)(input_size) * np.random.randn(input_size, output_size)
+    def __init__(self, input_size, output_size, weight_init="he"):
+        self.W = eval(weight_init)(input_size) * np.random.randn(
+            input_size, output_size
+        )
         self.b = eval(weight_init)(input_size) * np.random.randn(output_size)
         self.param = [self.W, self.b]
 
@@ -36,9 +38,12 @@ class Linear:
 
 
 class Convolution:
-    def __init__(self, input_channel, out_channel, filter_size, stride=1, pad=0, weight_init='he'):
-        self.W = (eval(weight_init)(input_channel * filter_size * filter_size) *
-                  np.random.randn(out_channel, input_channel, filter_size, filter_size))
+    def __init__(
+        self, input_channel, out_channel, filter_size, stride=1, pad=0, weight_init="he"
+    ):
+        self.W = eval(weight_init)(
+            input_channel * filter_size * filter_size
+        ) * np.random.randn(out_channel, input_channel, filter_size, filter_size)
         self.b = np.zeros(out_channel)
         self.param = [self.W, self.b]
 
@@ -227,13 +232,17 @@ class BatchNormalization:
         if train:
             mu = x.mean(axis=0)
             xc = x - mu
-            var = np.mean(xc ** 2, axis=0)
+            var = np.mean(xc**2, axis=0)
             std = np.sqrt(var + 10e-7)
             xn = xc / std
 
             self.xc, self.xn, self.std = xc, xn, std
-            self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * mu
-            self.running_var = self.momentum * self.running_var + (1 - self.momentum) * var
+            self.running_mean = (
+                self.momentum * self.running_mean + (1 - self.momentum) * mu
+            )
+            self.running_var = (
+                self.momentum * self.running_var + (1 - self.momentum) * var
+            )
         else:
             xc = x - self.running_mean
             xn = xc / np.sqrt(self.running_var + 10e-7)

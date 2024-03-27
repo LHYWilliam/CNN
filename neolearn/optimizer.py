@@ -46,7 +46,9 @@ class AdaGrad:
         for index in range(len(self.params)):
             self.h[index] += self.grads[index] * self.grads[index]
 
-            self.params[index] -= self.lr * self.grads[index] / (np.sqrt(self.h[index]) + basis)
+            self.params[index] -= (
+                self.lr * self.grads[index] / (np.sqrt(self.h[index]) + basis)
+            )
 
     def zero_grad(self):
         self.grads.clear()
@@ -64,13 +66,19 @@ class Adam:
             self.v = [np.zeros_like(param) for param in self.params]
 
         self.iter += 1
-        lr_t = self.lr * np.sqrt(1.0 - self.beta2 ** self.iter) / (1.0 - self.beta1 ** self.iter)
+        lr_t = (
+            self.lr
+            * np.sqrt(1.0 - self.beta2**self.iter)
+            / (1.0 - self.beta1**self.iter)
+        )
 
         for index in range(len(self.params)):
             self.m[index] += (1 - self.beta1) * (self.grads[index] - self.m[index])
             self.v[index] += (1 - self.beta2) * (self.grads[index] ** 2 - self.v[index])
 
-            self.params[index] -= lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)
+            self.params[index] -= (
+                lr_t * self.m[index] / (np.sqrt(self.v[index]) + basis)
+            )
 
     def load(self, params):
         self.m, self.v = params

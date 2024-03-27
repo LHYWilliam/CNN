@@ -27,33 +27,35 @@ def plots(lists, labels, xlabel, ylabel):
     plt.show()
 
 
-def progress_bar(now, total, message='', break_line=False, bar=True):
+def progress_bar(now, total, message="", break_line=False, bar=True):
     if bar:
         count = int(((now + 1) / total) * 10)
-        message += '     [' + '-' * count + ' ' * (10 - count) + ']' + f' {count}/10'
-    print(f'\r{message}', end='\n' if break_line else '')
+        message += "     [" + "-" * count + " " * (10 - count) + "]" + f" {count}/10"
+    print(f"\r{message}", end="\n" if break_line else "")
 
 
 def save(file, checkpoint):
-    with open(file, 'wb') as f:
+    with open(file, "wb") as f:
         pickle.dump(checkpoint, f)
 
 
 def load(file):
-    with open(file, 'rb') as f:
+    with open(file, "rb") as f:
         checkpoint = pickle.load(f)
 
     return checkpoint
 
 
-def increment_path(path, sep='', mkdir=True, exist_ok=True):
+def increment_path(path, sep="", mkdir=True, exist_ok=True):
     path = Path(path)
     if path.exists():
-        path, suffix = (path.with_suffix(''), path.suffix) if path.is_file() else (path, '')
+        path, suffix = (
+            (path.with_suffix(""), path.suffix) if path.is_file() else (path, "")
+        )
         back = path
 
         for n in range(2, 9999):
-            path = Path(f'{back}{sep}{n}{suffix}')
+            path = Path(f"{back}{sep}{n}{suffix}")
             if not path.exists():
                 break
 
@@ -68,7 +70,7 @@ def im2col(input_data, h, w, stride=1, pad=0):
     out_h = (H + 2 * pad - h) // stride + 1
     out_w = (W + 2 * pad - w) // stride + 1
 
-    img = np.pad(input_data, [(0, 0), (0, 0), (pad, pad), (pad, pad)], 'constant')
+    img = np.pad(input_data, [(0, 0), (0, 0), (pad, pad), (pad, pad)], "constant")
     col = np.zeros((N, C, h, w, out_h, out_w))
 
     for y in range(h):
@@ -99,20 +101,20 @@ def col2im(col, input_shape, h, w, stride=1, pad=0):
 
             img[:, :, y:y_max:stride, x:x_max:stride] += col[:, :, y, x, :, :]
 
-    return img[:, :, pad:H + pad, pad:W + pad]
+    return img[:, :, pad : H + pad, pad : W + pad]
 
 
 def print_args(args):
-    print('\narguments: ', end='')
+    print("\narguments: ", end="")
     for key, value in args.items():
-        print(f'{key}:{value}', end='  ', flush=True)
+        print(f"{key}:{value}", end="  ", flush=True)
 
 
 def print_cfg(layer_param):
     print("\n\nnumber    layer               param")
     for number, layer_param in enumerate(layer_param):
         layer, param = layer_param
-        print(f'{number:<10}{layer:20}{param}')
+        print(f"{number:<10}{layer:20}{param}")
 
 
 def to_gpu(*args):

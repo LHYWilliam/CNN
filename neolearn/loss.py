@@ -1,5 +1,5 @@
 from neolearn.np import *
-from neolearn.functions import (softmax, cross_entropy_error)
+from neolearn.functions import softmax, cross_entropy_error
 
 
 class SoftmaxWithLoss:

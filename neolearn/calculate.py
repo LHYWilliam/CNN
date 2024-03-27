@@ -19,19 +19,19 @@ class Calculate:
 
     @property
     def average_loss(self):
-        return np.average(self._loss[-self.train_iters // 10:])
+        return np.average(self._loss[-self.train_iters // 10 :])
 
     @property
     def train_average_accuracy(self):
-        return np.average(self.train_accuracy[-self.train_iters // 10:])
+        return np.average(self.train_accuracy[-self.train_iters // 10 :])
 
     @property
     def test_average_accuracy(self):
-        return np.average(self.test_accuracy[-self.test_iters:])
+        return np.average(self.test_accuracy[-self.test_iters :])
 
     @property
     def test_best_accuracy(self):
-        return max(self.test_accuracy[:-1:self.test_iters])
+        return max(self.test_accuracy[: -1 : self.test_iters])
 
     @property
     def test_last_accuracy(self):
@@ -39,8 +39,8 @@ class Calculate:
 
     @property
     def train_epochs_accuracy(self):
-        return self.train_accuracy[self.train_iters - 1::self.train_iters]
+        return self.train_accuracy[self.train_iters - 1 :: self.train_iters]
 
     @property
     def test_epochs_accuracy(self):
-        return self.test_accuracy[self.test_iters - 1::self.test_iters]
+        return self.test_accuracy[self.test_iters - 1 :: self.test_iters]

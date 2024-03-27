@@ -1,6 +1,14 @@
 import abc
 
-from neolearn.layers import (Linear, Convolution, Pooling, Flatten, ReLu, BatchNormalization, Dropout)  # DO NOT MOVE
+from neolearn.layers import (
+    Linear,
+    Convolution,
+    Pooling,
+    Flatten,
+    ReLu,
+    BatchNormalization,
+    Dropout,
+)  # DO NOT MOVE
 
 
 class BaseModel(abc.ABC):
