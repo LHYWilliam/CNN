@@ -5,17 +5,17 @@ import pathlib
 root = pathlib.Path(os.path.abspath(__file__)).parent
 sys.path.append(str(root))
 
-import loss
-import util
-import model
-import layers
-import datasets
-import optimizer
-import functions
+from neolearn import loss
+from neolearn import util
+from neolearn import model
+from neolearn import layers
+from neolearn import datasets
+from neolearn import optimizer
+from neolearn import functions
 
-from config import Config
-from trainer import Trainer
-from detector import Detector
-from dataloader import DataLoader
+from neolearn.config import Config
+from neolearn.trainer import Trainer
+from neolearn.detector import Detector
+from neolearn.dataloader import DataLoader
 
-from np import *
+from neolearn.np import *

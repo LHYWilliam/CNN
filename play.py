@@ -15,7 +15,9 @@ def main():
     numpy.random.seed(seed)
     np.random.seed(seed)
 
-    (x_train, t_train), (x_test, t_test) = neolearn.datasets.mnist.load(flatten=False)
+    classes, (x_train, t_train), (x_test, t_test) = neolearn.datasets.mnist.load(
+        flatten=False
+    )
     x_train, t_train, x_test, t_test = neolearn.util.to_gpu(
         x_train, t_train, x_test, t_test
     )
